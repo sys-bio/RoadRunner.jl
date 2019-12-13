@@ -1,5 +1,4 @@
 module RoadRunnerJulia
-
 __precompile__(false)
 
 export loada
@@ -494,7 +493,13 @@ end
 
 ## RRVectorHelper
 function computeSteadyStateValues(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :computeSteadyStateValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+  rrVector = ccall(dlsym(rrlib, :computeSteadyStateValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+  if rrVector == C_NULL
+    error(getLastError())
+  else
+    ssValues = convertRRVectorToJuliaArray(rrVector)
+    return ssValues
+  end
 end
 
 function setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)

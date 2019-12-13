@@ -121,7 +121,7 @@ end
 
 function getVectorElement(vector::Ptr{RRVector}, index::Int64)
   value = Array{Float64}(undef,1)
-  status = ccall(dlsym(rrlib, :getVectorElement), cdecl, Bool, (Ptr{RRVector}, Int64, Float64), vector, index, value)
+  status = ccall(dlsym(rrlib, :getVectorElement), cdecl, Bool, (Ptr{RRVector}, Int64, Ptr{Float64}), vector, index, value)
   if status == false
     error(getLastError())
   end
@@ -321,13 +321,10 @@ function freeMatrix(matrix::Ptr{RRDoubleMatrix})
   end
 end
 
-
-
-
 function convertStringArrayToJuliaArray(list::Ptr{RRStringArray})
-  num_elem = getNumberOfStringElements(list)
   julia_arr = String[]
   try
+    num_elem = getNumberOfStringElements(list)
     for i = 1:num_elem
       push!(julia_arr, getStringElement(list, i -1))
     end
@@ -335,6 +332,22 @@ function convertStringArrayToJuliaArray(list::Ptr{RRStringArray})
     throw(e)
   finally
     freeStringArray(list)
+  end
+  return julia_arr
+end
+
+function convertRRVectorToJuliaArray(vector::Ptr{RRVector})
+  julia_arr = Float64[]
+
+  try
+    num_elem = getVectorLength(vector)
+    for i = 1:num_elem
+      push!(julia_arr, getVectorElement(vector, i-1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeVector(vector)
   end
   return julia_arr
 end
