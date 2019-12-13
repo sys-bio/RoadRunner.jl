@@ -41,18 +41,9 @@ function loada(antString::String)
     return rr
 end
 
-function enableLoggingToConsole()
-  return ccall(dlsym(rrlib, :enableLoggingToConsole), cdecl, Int8, ())
-end
-
-function setLogLevel(lvl::String)
-  return ccall(dlsym(rrlib, :setLogLevel), cdecl, Int8, (Ptr{UInt8},), lvl)
-end
-
-function disableLoggingToConsole()
-    ccall(dlsym(rrlib, :disableLoggingToConsole), cdecl, Bool, ())
-end
-
+###############################################################################
+#            Library Initialization and Termination Methods                   #
+###############################################################################
 function createRRInstance()
   val = ccall(dlsym(rrlib, :createRRInstance), cdecl, Ptr{Nothing}, ())
   if val == C_NULL
@@ -83,6 +74,74 @@ function setInstallFolder(folder::String)
     error(getLastError())
   end
 end
+
+function setComputeAndAssignConservationLaws(rr::Ptr{Nothing}, OnOrOff::Bool)
+  status = ccall(dlsym(rrlib, :setComputeAndAssignConservationLaws), cdecl, Bool, (Ptr{Nothing} , Bool), rr, OnOrOff)
+  if status == false
+    error(getLastError())
+  end
+end
+
+###############################################################################
+#                            Read and Write Models                            #
+###############################################################################
+function loadSBML(rr::Ptr{Nothing}, sbml::String)
+  status = ccall(dlsym(rrlib, :loadSBML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, sbml)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
+  status = ccall(dlsym(rrlib, :loadSBMLEx), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, sbml, forceRecompile)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
+  status = ccall(dlsym(rrlib, :loadSBMLFromFile), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function loadSBMLFromFileE(rr::Nothing, fileName::String, forceRecompile::Bool)
+  status = ccall(dlsym(rrlib, :loadSBMLFromFileE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, fileName, forceRecompile)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function clearModel(rr::Ptr{Nothing})
+  status = ccall(dlsym(rrlib, :clearModel), cdecl, Int8, (Ptr{Nothing}, ), rr)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function isModelLoaded(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
+end
+
+function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
+  status = call(dlsym(rrlib, :loadSimulationSettings), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getCurrentSBML(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+function getSBML(rr::Ptr{Nothing})
+   return unsafe_string(ccall(dlsym(rrlib, :getSBML), Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+###############################################################################
+#                          Utilities Functions                               #
+###############################################################################
 
 function getAPIVersion()
   return unsafe_string(ccall(dlsym(rrlib, :getAPIVersion), cdecl, Ptr{UInt8}, ()))
@@ -130,10 +189,6 @@ end
 
 function getlibSBMLVersion(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getlibSBMLVersion), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
-end
-
-function getCurrentSBML(rr::Ptr{Nothing})
-  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
 function setTempFolder(rr::Ptr{Nothing}, folder::String)
@@ -195,6 +250,10 @@ function setCodeGenerationMode(rr::Ptr{Nothing}, mode::Int64)
   end
 end
 
+###############################################################################
+#                      Error Handling Functions                               #
+###############################################################################
+
 function hasError()
   return ccall(dlsym(rrlib, :hasError), cdecl, Bool, ())
 end
@@ -203,337 +262,228 @@ function getLastError()
   return unsafe_string(ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ()))
 end
 
-function setComputeAndAssignConservationLaws(rr::Ptr{Nothing}, OnOrOff::Bool)
-  status = ccall(dlsym(rrlib, :setComputeAndAssignConservationLaws), cdecl, Bool, (Ptr{Nothing} , Bool), rr, OnOrOff)
+###############################################################################
+#                         Logging Functionality                               #
+###############################################################################
+
+function enableLoggingToConsole()
+  status = ccall(dlsym(rrlib, :enableLoggingToConsole), cdecl, Int8, ())
   if status == false
     error(getLastError())
   end
 end
 
-function loadSBML(rr::Ptr{Nothing}, sbml::String)
-  status = ccall(dlsym(rrlib, :loadSBML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, sbml)
+function disableLoggingToConsole()
+  status = ccall(dlsym(rrlib, :disableLoggingToConsole), cdecl, Bool, ())
   if status == false
     error(getLastError())
   end
 end
 
-function loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
-  status = ccall(dlsym(rrlib, :loadSBMLEx), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, sbml, forceRecompile)
+function enableLoggingToFile()
+  status = ccall(dlsym(rrlib, :enableLoggingToFile), cdecl, Bool, ())
   if status == false
     error(getLastError())
   end
 end
 
-function loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
-  status = ccall(dlsym(rrlib, :loadSBMLFromFile), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
+function enableLoggingToFileWithPath(path::String)
+  status = ccall(dlsym(rrlib, :enableLoggingToConsole), cdecl, Bool, (Ptr{UInt8},), path)
   if status == false
     error(getLastError())
   end
 end
 
-function loadSBMLFromFileE(rr::Nothing, fileName::String, forceRecompile::Bool)
-  status = ccall(dlsym(rrlib, :loadSBMLFromFileE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, fileName, forceRecompile)
+function disableLoggingToFile()
+  status = ccall(dlsym(rrlib, :disableLoggingToFile), cdecl, Bool, ())
   if status == false
     error(getLastError())
   end
 end
 
-function clearModel(rr::Ptr{Nothing})
-  status = ccall(dlsym(rrlib, :clearModel), cdecl, Int8, (Ptr{Nothing}, ), rr)
+function setLogLevel(lvl::String)
+  return ccall(dlsym(rrlib, :setLogLevel), cdecl, Int8, (Ptr{UInt8},), lvl)
+end
+
+function getLogLevel()
+  return unsafe_string(ccall(dlsym(rrlib, :getLogLevel), cdecl, Ptr{UInt8}, ()))
+end
+
+function getLogFileName()
+  return unsafe_string(ccall(dlsym(rrlib, :getLogFileName), cdecl, Ptr{UInt8}, ()))
+end
+
+## Todo, enum type
+function logMsg()
+end
+
+
+###############################################################################
+#                         Current State of System                             #
+###############################################################################
+function getValue(rr::Ptr{Nothing}, symbolId::String)
+  #value = Array{Float64}(undef,1)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getValue), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{Float64}), rr, symbolId, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+function setValue(rr::Ptr{Nothing}, symbolId::String, value::Float64)
+  status = ccall(dlsym(rrlib, :setValue), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Float64), rr, symbolId, value)
   if status == false
     error(getLastError())
   end
 end
 
-function isModelLoaded(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
-end
-
-function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
-  status = call(dlsym(rrlib, :loadSimulationSettings), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
+function evalModel(rr::Ptr{Nothing})
+  status = ccall(dlsym(rrlib, :evalModel), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
     error(getLastError())
   end
 end
 
-function getSBML(rr::Ptr{Nothing})
-   return unsafe_string(ccall(dlsym(rrlib, :getSBML), Ptr{UInt8}, (Ptr{Nothing},), rr))
+## To test
+function getEigenvalueIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getEigenvalueIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  eigenValueIds = convertStringArrayToJuliaArray(data)
+  return eigenValueIds
 end
 
-function getParamPromotedSBML(rr::Ptr{Nothing}, sArg::String)
-  return unsafe_string(ccall(dlsym(rrlib, :getParamPromotedSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, sArg))
+function getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getAvailableTimeCourseSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
+
+function getAvailableSteadyStateSymbols(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getAvailableSteadyStateSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
+end
+
+###############################################################################
+#                         Time Course Simulation                              #
+###############################################################################
 
 function setConfigurationXML(rr::Ptr{Nothing}, caps::String)
-  ccall(dlsym(rrlib, :setConfigurationXML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, caps)
+  status = ccall(dlsym(rrlib, :setConfigurationXML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, caps)
+  if status == false
+    error(getLastError())
+  end
 end
 
 function getConfigurationXML(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getConfigurationXML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
-function unLoadModel(rr)
-  return ccall(dlsym(rrlib, :unLoadModel), cdecl, Bool, (Ptr{Nothing},), rr)
+function setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
+   status = ccall(dlsym(rrlib, :setTimeStart), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeStart)
+   if status == false
+     error(getLastError())
+   end
 end
 
-function setTimeStart(rr, timeStart::Float64)
-  return ccall(dlsym(rrlib, :setTimeStart), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeStart)
-end
-
-function setTimeEnd(rr, timeEnd::Float64)
-  return ccall(dlsym(rrlib, :setTimeEnd), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeEnd)
-end
-
-function setNumPoints(rr, nrPoints::Int64)
-  return ccall(dlsym(rrlib, :setNumPoints), cdecl, Bool, (Ptr{Nothing}, Int64), rr, nrPoints)
-end
-
-function getTimeStart(rr)
-  #timeStart = Array(Float64, 1)
-  timeStart = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getTimeStart), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, timeStart)
-  return value[1]
-end
-
-function getTimeEnd(rr)
-  #timeEnd = Array(Float64, 1)
-  timeEnd = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getTimeEnd), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, timeEnd)
-  return value[1]
-end
-
-function getNumPoints(rr)
-  #numPoints = Array(Int64, 1)
-  numPoints = Array{Int64}(undef,1)
-  ccall(dlsym(rrlib, :getNumPoints), cdecl, Bool, (Ptr{Nothing}, Ptr{Int64}), rr, numPoints)
-end
-
-function setTimeCourseSelectionList(rr, list::String)
-  return ccall(dlsym(rrlib, :setTimeCourseSelectionList), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
-end
-
-function getTimeCourseSelectionList(rr)
-  return ccall(dlsym(rrlib, :getTimeCourseSelectionList), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function simulateEx(rr, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
-  return ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Float64, Float64, Int64), rr, timeStart, timeEnd, numberOfPoints)
-end
-
-function getSimulationResult(rr)
-  return ccall(dlsym(rrlib, :getSimulationResult), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getReactionIds(rr)
-  return ccall(dlsym(rrlib, :getReactionIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getRatesOfChange(rr)
-  return ccall(dlsym(rrlib, :getRatesOfChange), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getRatesOfChangeIds(rr)
-  return ccall(dlsym(rrlib, :getRatesOfChangeIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getUnscaledElasticityMatrix(rr)
-  return ccall(dlsym(rrlib, :getUnscaledElasticityMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getScaledElasticityMatrix(rr)
-  return ccall(dlsym(rrlib, :getScaledElasticityMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getValue(rr, symbolId::String)
-  #value = Array{Float64}(undef,1)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getValue), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{Float64}), rr, symbolId, value)
-end
-
-function setValue(rr, symbolId::String, value::Float64)
-  return ccall(dlsym(rrlib, :setValue), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Float64), rr, symbolId, value)
-end
-
-function getStoichiometryMatrix(rr)
-  return ccall(dlsym(rrlib, :getStoichiometryMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getConservationMatrix(rr)
-  return ccall(dlsym(rrlib, :getConservationMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getLinkMatrix(rr)
-  return ccall(dlsym(rrlib, :getLinkMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getNrMatrix(rr)
-  return ccall(dlsym(rrlib, :getNrMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getNumberOfReactions(rr)
-  return ccall(dlsym(rrlib, :getNumberOfReactions), cdecl, Int64, (Ptr{Nothing},), rr)
-end
-
-function getReactionRate(rr, rateNr::Int64)
-  #value = Array{Float64}(undef,1)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getReactionRate), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, rateNr, value)
-  return value[1]
-end
-
-function getReactionRates(rr)
-  return ccall(dlsym(rrlib, :getReactionRates), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getNumberOfBoundarySpecies(rr)
-  return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Cint, (Ptr{Nothing},), rr)
-end
-
-function getBoundarySpeciesIds(rr)
-  data = ccall(dlsym(rrlib, :getBoundarySpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
-  num_b_species = getNumberOfBoundarySpecies(rr)
-  println("this is the number of boundary species", num_b_species)
-  b_species = Array{String}(undef, num_b_species)
-  try
-    for i = 1:num_b_species
-      b_species[i] = getStringElement(data, i - 1)
-    end
-  finally
-    freeStringArray(data)
+function setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
+  status = ccall(dlsym(rrlib, :setTimeEnd), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeEnd)
+  if status == false
+    error(getLastError())
   end
-  return b_species
 end
 
-function getNumberOfFloatingSpecies(rr)
-  return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
-end
-
-function getFloatingSpeciesIds(rr::Ptr{Nothing})
-  data = ccall(dlsym(rrlib, :getFloatingSpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
-  num_species = getNumberOfFloatingSpecies(rr)
-  species = Array{String}(undef, num_species)
-  try
-    for i = 1:num_species
-      species[i] = getStringElement(data, i - 1)
-    end
-  finally
-    freeStringArray(data)
+function setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
+  status = ccall(dlsym(rrlib, :setNumPoints), cdecl, Bool, (Ptr{Nothing}, Int64), rr, nrPoints)
+  if status == false
+    error(getLastError())
   end
-  return species
 end
 
-function getNumberOfGlobalParameters(rr)
-  return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
+function setTimeCourseSelectionList(rr::Ptr{Nothing}, list::String)
+  status = ccall(dlsym(rrlib, :setTimeCourseSelectionList), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
+  if status == false
+    error(getLastError())
+  end
 end
 
-function getGlobalParameterIds(rr)
-  data = ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
-  num_elem = getNumberOfGlobalParameters(rr)
-  println("number of elements: ", num_elem)
-  data_arr = Array{String}(undef, num_elem)
+## RRStringArray Helper
+function getTimeCourseSelectionList(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getTimeCourseSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+end
+
+function simulate(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :simulate), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
+  print(data)
+  return simulate_helper(data)
+end
+
+## Handle RRCData
+function getSimulationResult(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getSimulationResult), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
+end
+
+# calls simulateEx
+function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
+  data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, steps)
+  return simulate_helper(data)
+end
+
+function simulate_helper(data::Ptr{RRCData})
+  num_row = getRRDataNumRows(data)
+  num_col = getRRDataNumCols(data)
+  data_arr = Array{Float64}(undef, num_row, num_col)
   try
-    for i = 1:num_elem
-      data_arr[i] = getStringElement(data, i - 1)
+    for r = 1:num_row
+        for c = 1:num_col
+            data_arr[r, c] = getRRCDataElement(data, r - 1, c - 1)
+        end
     end
+  catch e
+    throw(e)
   finally
-    freeStringArray(data)
+    freeRRCData(data)
   end
   return data_arr
 end
 
-function getFloatingSpeciesInitialConcentrationByIndex(rr, index::Int64)
-  #value = Array{Float64}(undef,1)
-  value = Array{Floating64}(undef,1)
-  ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+function oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :oneStep), cdecl, Bool, (Ptr{Nothing}, Float64, Float64, Ptr{Float64}), rr, currentTime, stepSize, value)
+  if status == false
+    error(getLastError())
+  end
   return value[1]
 end
 
-function getFloatingSpeciesConcentrations(rr)
-  return ccall(dlsym(rrlib, :getFloatingSpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+function getTimeStart(rr::Ptr{Nothing})
+  timeStart = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getTimeStart), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, timeStart)
+  if status == false
+    error(getLastError())
+  end
+  return timeStart[1]
 end
 
-function getBoundarySpeciesConcentrations(rr)
-  return ccall(dlsym(rrlib, :getBoundarySpeciesConcentrations), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function getTimeEnd(rr::Ptr{Nothing})
+  #timeEnd = Array(Float64, 1)
+  timeEnd = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getTimeEnd), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, timeEnd)
+  if status == false
+    error(getLastError())
+  end
+  return timeEnd[1]
 end
 
-function getFloatingSpeciesInitialConcentrations(rr)
-  return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrations), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function getNumPoints(rr)
+  numPoints = Array{Int64}(undef,1)
+  status = ccall(dlsym(rrlib, :getNumPoints), cdecl, Bool, (Ptr{Nothing}, Ptr{Int64}), rr, numPoints)
+  if status == false
+    error(getLastError())
+  end
+  return numPoints[1]
 end
 
-function setFloatingSpeciesByIndex(rr, index::Int64, value::Float64)
-  return ccall(dlsym(rrlib, :setFloatingSpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
-end
-
-function setBoundarySpeciesByIndex(rr, index::Int64, value::Float64)
-  return ccall(dlsym(rrlib, :setBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
-end
-
-function setGlobalParameterByIndex(rr, index::Int64, value::Float64)
-  return ccall(dlsym(rrlib, :setGlobalParameterByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
-end
-
-function setFloatingSpeciesInitialConcentrationByIndex(rr, index::Int64, value::Float64)
-  return ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
-end
-
-function setFloatingSpeciesInitialConcentrations(rr, vec)
-  return ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{Nothing}), rr, vec)
-end
-
-function setFloatingSpeciesConcentrations(rr, vec)
-  return ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{Nothing}), rr, vec)
-end
-
-function setBoundarySpeciesConcentrations(rr, vec)
-  return ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{Nothing}), rr, vec)
-end
-
-function oneStep(rr, currentTime::Float64, stepSize::Float64)
-  #value = Array{Float64}(undef,1)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :oneStep), cdecl, Bool, (Ptr{Nothing}, Float64, Float64), rr, currentTime, stepSize)
-end
-
-function getGlobalParameterValues(rr)
-  return ccall(dlsym(rrlib, :getGlobalParameterValues), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getAvailableTimeCourseSymbols(rr)
-  return ccall(dlsym(rrlib, :getAvailableTimeCourseSymbols), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getAvailableSteadyStateSymbols(rr)
-  return ccall(dlsym(rrlib, :getAvailableSteadyStateSymbols), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getBoundarySpeciesByIndex(rr, index::Int64)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
-  return value[1]
-end
-
-function getFloatingSpeciesByIndex(rr, index::Int64)
-  #value = Array{Float64}(undef,1)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getFloatingSpeciesByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
-  return value[1]
-end
-
-function getGlobalParameterByIndex(rr, index::Int64)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getGlobalParameterByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
-  return value[1]
-end
-
-function getNumberOfDependentSpecies(rr)
-  return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
-end
-
-function getNumberOfIndependentSpecies(rr)
-  return ccall(dlsym(rrlib, :getNumberOfIndependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
-end
-
-function steadyState(rr)
+###############################################################################
+#                            Steady State Routines                            #
+###############################################################################
+function steadyState(rr::Ptr{Nothing})
   value = Array{Float64}(undef, 1)
   status = ccall(dlsym(rrlib, :steadyState), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, value)
   if status == false
@@ -542,115 +492,400 @@ function steadyState(rr)
   return value[1]
 end
 
-function evalModel(rr)
-  return ccall(dlsym(rrlib, :evalModel), cdecl, Bool, (Ptr{Nothing},), rr)
+## RRVectorHelper
+function computeSteadyStateValues(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :computeSteadyStateValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-function computeSteadyStateValues(rr)
-  return ccall(dlsym(rrlib, :computeSteadyStateValues), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
+  status = ccall(dlsym(rrlib, :setSteadyStateSelectionList), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
+  if status == false
+    error(getLastError())
+  end
 end
 
-function setSteadyStateSelectionList(rr, list::String)
-  return ccall(dlsym(rrlib, :setSteadyStateSelectionList), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
+## RRStringArray Helper
+function getSteadyStateSelectionList(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getSteadyStateSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
-function getSteadyStateSelectionList(rr)
-  return ccall(dlsym(rrlib, :getSteadyStateSelectionList), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+###############################################################################
+#                               Reaction Group                                #
+###############################################################################
+
+function getNumberOfReactions(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfReactions), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
-function getFullJacobian(rr)
-  return ccall(dlsym(rrlib, :getFullJacobian), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function getReactionRate(rr::Ptr{Nothing}, idx::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getReactionRate), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, rateNr, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
 end
 
-function getReducedJacobian(rr)
-  return ccall(dlsym(rrlib, :getReducedJacobian), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+### RRVector Helper
+function getReactionRates(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getReactionRates), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-function getEigenvalues(rr)
-  return ccall(dlsym(rrlib, :getEigenvalues), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+### RRVector Helper
+function getReactionRatesEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+  return_vec = call(dlsym(rrlib, :getReactionRatesEx), cdecl, Ptr{RRVector}, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
+  return return_vec
 end
 
-function getFloatingSpeciesInitialConditionIds(rr)
-  return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConditionIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function getReactionIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getReactionIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+  num_rxns = getNumberOfReactions(rr)
+  rxnIds = String[]
+  try
+    for i = 1:num_rxns
+      push!(rxnIds, getStringElement(data, i - 1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeStringArray(data)
+  end
+  return rxnIds
 end
 
-function getRatesOfChangeEx(rr, vec)
-  return ccall(dlsym(rrlib, :getRatesOfChangeEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Ptr{Nothing}), rr, vec)
+###############################################################################
+#                            Rates of Change Group                            #
+###############################################################################
+
+
+### RRVector Helper
+function getRatesOfChange(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getRatesOfChange), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-function getReactionRatesEx(rr, vec)
-  return ccall(dlsym(rrlib, :getReactionRatesEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Ptr{Nothing}), rr, vec)
+### RRVector Helper
+function getRatesOfChangeIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getRatesOfChangeIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
-function getElasticityCoefficientIds(rr)
-  return ccall(dlsym(rrlib, :getElasticityCoefficientIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function getRateOfChange(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib :getRateOfChange), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, inde, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
 end
 
-function getEigenvalueIds(rr)
-  return ccall(dlsym(rrlib, :getEigenvalueIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+## RRVector Helper
+function getRatesOfChangeEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+  return ccall(dlsym(rrlib, :getRatesOfChangeEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
 end
 
-function getFluxControlCoefficientIds(rr)
-  return ccall(dlsym(rrlib, :getFluxControlCoefficientIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+###############################################################################
+#                           Boundary Species Group                            #
+###############################################################################
+
+## RRVectorHelper
+function getBoundarySpeciesConcentrations(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getBoundarySpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-function getUnscaledConcentrationControlCoefficientIds(rr)
-  return ccall(dlsym(rrlib, :getUnscaledConcentrationControlCoefficientIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+function setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+  status = ccall(dlsym(rrlib, :setBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
 end
 
-function getNumberOfCompartments(rr)
+function getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+## RRVectorHelper
+function setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+  status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getNumberOfBoundarySpecies(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Int64, (Ptr{Nothing},), rr)
+end
+
+function getBoundarySpeciesIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getBoundarySpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  b_species = String[]
+  try
+    num_b_species = getNumberOfBoundarySpecies(rr)
+    for i = 1:num_b_species
+      push!(b_species, getStringElement(data, i - 1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeStringArray(data)
+  end
+  return b_species
+end
+
+###############################################################################
+#                           Floating Species Group                            #
+###############################################################################
+
+## RRVectorHelper
+function getFloatingSpeciesConcentrations(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getFloatingSpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+end
+
+function setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+  status = call(dlsym(rrlib, :setFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Floating64}(undef,1)
+  status = ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+function setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+  status = ccall(dlsym(rrlib, :setFloatingSpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getFloatingSpeciesByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+function setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+  status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getNumberOfFloatingSpecies(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
+end
+
+function getNumberOfDependentSpecies(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
+end
+
+function getNumberOfIndependentSpecies(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfIndependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
+end
+
+function getFloatingSpeciesIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getFloatingSpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  species = String[]
+  try
+    num_species = getNumberOfFloatingSpecies(rr)
+    for i = 1:num_species
+      push!(species, getStringElement(data, i - 1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeStringArray(data)
+  end
+  return species
+end
+
+###############################################################################
+#                           Intial Conditions Group                           #
+###############################################################################
+
+function setFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+  status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
+  if status == false
+    error(getLastError())
+  end
+end
+
+## RRVectorHelper
+function getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+end
+
+## RRStringArrayHelper
+function getFloatingSpeciesInitialConditionIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getFloatingSpeciesInitialConditionIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  return data
+end
+
+###############################################################################
+#                              Parameters Group                               #
+###############################################################################
+
+## RRVectorHelper
+function getGlobalParameterValues(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getGlobalParameterValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+end
+
+function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+  status = ccall(dlsym(rrlib, :setGlobalParameterByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib, :getGlobalParameterByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+function getNumberOfGlobalParameters(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
+end
+
+function getGlobalParameterIds(rr::Ptr{Nothing})
+  data = ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  global_params = String[]
+  try
+    num_elem = getNumberOfGlobalParameters(rr)
+    for i = 1:num_elem
+      push!(global_params, getStringElement(data, i - 1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeStringArray(data)
+  end
+  return global_params
+end
+
+###############################################################################
+#                              Compartment Group                              #
+###############################################################################
+
+function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
+  value = Array{Float64}(undef,1)
+  status = ccall(dlsym(rrlib :getCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
+end
+
+function setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+  status = ccall(dlsym(rrlib, :setCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  if status == false
+    error(getLastError())
+  end
+end
+
+function getNumberOfCompartments(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCompartments), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
-function getCompartmentByIndex(rr, index::Int64)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib :getCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, inde, value)
-  return value[1]
-end
-
-function setCompartmentByIndex(rr, index::Int64, value::Float64)
-  return ccall(dlsym(rrlib, :setCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
-end
-
 function getCompartmentIds(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :getCompartmentIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  data = ccall(dlsym(rrlib, :getCompartmentIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+  compartmentIds = String[]
+  try
+    num_elem = getNumberOfCompartments(rr)
+    for i = 1:num_elem
+      push!(compartmentIds, getStringElement(data, i - 1))
+    end
+  catch e
+    throw(e)
+  finally
+    freeStringArray(data)
+  end
+  return compartmentIds
 end
 
-function getRateOfChange(rr, index::Int64)
-  value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib :getRateOfChange), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, inde, value)
-  return value[1]
+###############################################################################
+#                        Metabolic Control Analysis                           #
+###############################################################################
+
+## RRListHelper
+function getElasticityCoefficientIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getElasticityCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
+
+## RRListHelper
+function getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
+end
+
+
+## RRListHelper
+function getFluxControlCoefficientIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
+end
+
+## RRListHelper
+function getUnscaledConcentrationControlCoefficientIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getUnscaledConcentrationControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
+end
+
+## RRListHelper
+function getConcentrationControlCoefficientIds(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getConcentrationControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getUnscaledElasticityMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getUnscaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getScaledElasticityMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getScaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
 
 function getScaledFloatingSpeciesElasticity(rr::Ptr{Nothing}, reactionId::String, speciesId::String)
   value = Array{Float64}(undef,1)
-  ccall(dlsym(rrlib, :getScaledFloatingSpeciesElasticity), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, reactionId, speciesId, value)
+  status = ccall(dlsym(rrlib, :getScaledFloatingSpeciesElasticity), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, reactionId, speciesId, value)
+  if status == false
+    error(getLastError())
+  end
+  return value[1]
 end
 
-
-
-function getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getConcentrationControlCoefficientIds(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :getConcentrationControlCoefficientIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
-end
-
-function getUnscaledConcentrationControlCoefficientMatrix(rr)
+## RRDoubleMatrixHelper
+function getUnscaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledConcentrationControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
+## RRDoubleMatrixHelper
 function getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledConcentrationControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
+## RRDoubleMatrixHelper
 function getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+  return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
+## RRDoubleMatrixHelper
 function getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :getScaledFluxControlCoefficientMatrix), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+  return ccall(dlsym(rrlib, :getScaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
@@ -689,13 +924,17 @@ function getuEE(rr::Ptr{Nothing}, name::String, species::String)
   return value[1]
 end
 
+###############################################################################
+#                           Stochastic Simulation                             #
+###############################################################################
+
 function getSeed(rr::Ptr{Nothing})
   value = Array{Float32}(undef,1)
   status = ccall(dlsym(rrlib, :getSeed), cdecl, Bool, (Ptr{Nothing}, Ptr{Float32}), rr, value)
   if status == false
     error(getLastError())
   end
-  return result
+  return value[1]
 end
 
 function setSeed(rr::Ptr{Nothing}, result::Float32)
@@ -705,38 +944,137 @@ function setSeed(rr::Ptr{Nothing}, result::Float32)
   end
 end
 
+## RRCDataHelper
 function gillespie(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :gillespie), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+  return ccall(dlsym(rrlib, :gillespie), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
+## RRCDataHelper
 function gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
-  return ccall(dlsym(rrlib, :gillespieEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Float64, Float64), rr, timeStart, timeEnd)
+  return ccall(dlsym(rrlib, :gillespieEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64), rr, timeStart, timeEnd)
 end
 
+## RRCDataHelper
 function gillespieOnGrid(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :gillespieOnGrid), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
+  return ccall(dlsym(rrlib, :gillespieOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
+## RRCDataHelper
 function gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
-  return ccall(dlsym(rrlib, :gillespieOnGridEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Float64, Float64, Int64), rr, timeStart, timeEnd, numberOfPoints)
+  return ccall(dlsym(rrlib, :gillespieOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64), rr, timeStart, timeEnd, numberOfPoints)
 end
 
+## RRCDataHelper
 function gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
-  return ccall(dlsym(rrlib, :gillespieMeanOnGrid), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
+  return ccall(dlsym(rrlib, :gillespieMeanOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
+## RRCDataHelper
 function gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
-  return ccall(dlsym(rrlib, :gillespieMeanOnGridEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
+  return ccall(dlsym(rrlib, :gillespieMeanOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
 
+## RRCDataHelper
 function gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
-  return ccall(dlsym(rrlib, :gillespieMeanSDOnGrid), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
+  return ccall(dlsym(rrlib, :gillespieMeanSDOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
+## RRCDataHelper
 function gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
-  return ccall(dlsym(rrlib, :gillespieMeanSDOnGridEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
+  return ccall(dlsym(rrlib, :gillespieMeanSDOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
 
+###############################################################################
+#                           Stoichiometry Analysis                            #
+###############################################################################
+
+## RRDoubleMatrixHelper
+function getFullJacobian(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getFullJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getReducedJacobian(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getReducedJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getEigenvalues(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getEigenvalues), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getStoichiometryMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getStoichiometryMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getLinkMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getLinkMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getNrMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNrMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getConservationMatrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getConservationMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRDoubleMatrixHelper
+function getL0Matrix(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getL0Matrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
+end
+
+## RRComplexMatrixHelper
+function getEigenVectors(matrix::Ptr{RRComplexMatrix})
+  return ccall(dlsym(rrlib, :getEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
+end
+
+## RRComplexMatrixHelper
+function getZEigenVectors(matrix::Ptr{RRComplexMatrix})
+  return ccall(dlsym(rrlib, :getZEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
+end
+
+## RRVector
+function getConservedSums(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getConservedSums), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
+end
+
+###############################################################################
+#                      Network Object Model Functions                         #
+###############################################################################
+
+function getNumberOfRules(rr::Ptr{Nothing})
+  result = ccall(dlsym(rrlib, :getConservedSums), cdecl, Cint, (Ptr{Nothing},), rr)
+  if result == -1
+    error(getLastError())
+  end
+end
+
+## could return null, error checking
+function getModelName(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getModelName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+###############################################################################
+#                           Linear Algebra Functions                          #
+###############################################################################
+## RRDoubleMatrixHelper
+function getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
+  return ccall(dlsym(rrlib, :getEigenvaluesMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{RRDoubleMatrix},), rr)
+end
+
+## RRComplexVectorHelper
+function getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+  return ccall(dlsym(rrlib, :getEigenvaluesVector), cdecl, Ptr{RRComplexVector}, (Ptr{RRDoubleMatrix},), rr)
+end
+
+###############################################################################
+#                               Reset Methods                                 #
+###############################################################################
 function resetRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :reset), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -757,6 +1095,299 @@ function resetToOriginRR(rr::Ptr{Nothing})
     error(getLastError())
   end
 end
+
+###############################################################################
+#                          Solver Options and APIs                            #
+###############################################################################
+
+function getNumRegisteredIntegrators()
+  return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
+end
+
+function getRegisteredIntegratorName(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorName), cdecl, Ptr{UInt8}, (Cint,), n))
+end
+
+function getRegisteredIntegratorHint(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorHint), cdecl, Ptr{UInt8}, (Cint,), n))
+end
+
+function getRegisteredIntegratorDescription(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorDescription), cdecl, Ptr{UInt8}, (Cint,), n))
+end
+
+function getNumInstantiatedIntegrators(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumInstantiatedIntegrators), cdecl, Cint, (Ptr{Nothing},), rr)
+end
+
+function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
+  result = ccall(dlsym(rrlib, :setCurrentIntegrator), cdecl, Cint, (Ptr{Nothing}, String), rr, nameOfIntegrator)
+  if result == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentIntegratorName(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+function getCurrentIntegratorDescription(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+function getCurrentIntegratorHint(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorHint), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+end
+
+function getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getNumberOfCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing}, ), rr)
+end
+
+function getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
+end
+
+function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
+  result = ccall(dlsym(rrlib, :resetCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing},), rr)
+  if result == 0
+    error(getLastError())
+  end
+end
+
+## RRStringArrayHelper
+function getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getListOfCurrentIntegratorParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+end
+
+function getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
+end
+
+function getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
+end
+
+function getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  return ccall(dlsym(rrlib, :setCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+end
+
+function getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
+  status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
+end
+
+function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
+  status = ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getNumRegisteredSteadyStateSolvers()
+  return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
+end
+
+function getRegisteredSteadyStateSolverName(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverName), cdecl, Ptr{UInt8}, (Cint, ), n))
+end
+
+function getRegisteredSteadyStateSolverHint(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Cint, ), n))
+end
+
+function getRegisteredSteadyStateSolverDescription(n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Cint, ), n))
+end
+
+function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
+  status = ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, nameOfSteadyStateSolver)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
+end
+
+function getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
+end
+
+function getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
+end
+
+function getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Cint, (Ptr{Nothing}, ), rr)
+end
+
+function getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
+end
+
+function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
+end
+
+function resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+  status = ccall(dlsym(rrlib, :resetCurrentSteadyStateSolverParameters), cdecl, Cint, (Ptr{Nothing},), rr)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function solverTypeToString(code::Int64)
+  return unsafe_string(ccall(dlsym(rrlib, :solverTypeToString), cdecl, Ptr{UInt8}, (Cint, ), code))
+end
+
+function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
+end
+
+## RRString helper function
+function getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
+  return ccall(dlsym(rrlib, :getListOfCurrentSteadyStateSolverParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing}, ), rr)
+end
+
+function getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
+end
+
+function getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
+end
+
+function getCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterDouble), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+function getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
+end
+
+function setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == 0
+    error(getLastError())
+  end
+end
+
+###############################################################################
+#                        Configuration Keys and Values                        #
+###############################################################################
 
 function setConfigBool(key::String, value::Bool)
     status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
@@ -844,37 +1475,6 @@ function getNumberOfFloatingSpecies(rr)
      return n
 end
 
-function simulate(rr::Ptr{Nothing})
-  data = ccall(dlsym(rrlib, :simulate), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
-  print(data)
-  return simulate_helper(data)
-end
-
-function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
-  data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, steps)
-  return simulate_helper(data)
-end
-
-function simulate_helper(data::Ptr{RRCData})
-  num_row = getRRDataNumRows(data)
-  num_col = getRRDataNumCols(data)
-  println(num_row)
-  println(num_col)
-  data_arr = Array{Float64}(undef, num_row, num_col)
-  try
-    for r = 1:num_row
-        for c = 1:num_col
-            data_arr[r, c] = getRRCDataElement(data, r - 1, c - 1)
-        end
-    end
-  catch e
-    throw(e)
-  finally
-    freeRRCData(data)
-  end
-  return data_arr
-end
-
 function createRRCData(rrDataHandle)
     return ccall(dlsym(rrlib, :createRRCData), cdecl, UInt, (Ptr{Nothing},), rrDataHandle)
 end
@@ -952,4 +1552,9 @@ end
 function isModelLoaded(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Int8, (Ptr{Nothing}, ), rr)
 end
+
+function getParamPromotedSBML(rr::Ptr{Nothing}, sArg::String)
+  return unsafe_string(ccall(dlsym(rrlib, :getParamPromotedSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, sArg))
+end
+
 end # module
