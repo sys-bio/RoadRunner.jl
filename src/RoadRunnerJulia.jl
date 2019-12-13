@@ -9,8 +9,13 @@ export steadyState
 
 
 using Libdl
-rrlib = Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")
-antlib = Libdl.dlopen("C:/Users/lukez/OneDrive/Desktop/Network Generator/Network-Generator/libantimony.dll")
+push!(Libdl.DL_LOAD_PATH, "./")
+current_dir = @__DIR__
+rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
+antimony_api = joinpath(current_dir, "libantimony.dll")
+
+rrlib = Libdl.dlopen(rr_api)
+antlib = Libdl.dlopen(antimony_api)
 # Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")
 
 # println("this is the value of rrlib outside of the function: ", rrlib)
