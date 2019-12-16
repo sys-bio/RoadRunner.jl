@@ -1,4 +1,4 @@
-using Documenter, RoadRunnerJulia, DocumenterLaTeX
+using Documenter, RoadRunnerJulia
 
 isCI = get(ENV, "CI", nothing) == "true"
 
