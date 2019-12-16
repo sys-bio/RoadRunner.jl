@@ -48,6 +48,10 @@ end
 ###############################################################################
 #            Library Initialization and Termination Methods                   #
 ###############################################################################
+"""
+    createRRInstance()
+Initialize  and return a new roadRunner instances.
+"""
 function createRRInstance()
   val = ccall(dlsym(rrlib, :createRRInstance), cdecl, Ptr{Nothing}, ())
   if val == C_NULL
@@ -56,11 +60,19 @@ function createRRInstance()
   return val
 end
 
+"""
+    createRRInstanceEx()
+Initialize  and return a new roadRunner instance.
+"""
 function createRRInstanceEx(tempFolder::String, compiler_cstr::String)
   val = ccall(dlsym(rrlib, :createRRInstanceEx), cdecl, Ptr{Nothing}, (Ptr{UInt8}, Ptr{UInt8}), tempFolder, compiler_cstr)
   return val
 end
 
+"""
+    freeRRInstance()
+Free the roadRunner instance.
+"""
 function freeRRInstance(rr::Ptr{Nothing})
   free_status = ccall(dlsym(rrlib, :freeRRInstance), cdecl, Bool, (Ptr{Nothing},), rr)
   if free_status == false
@@ -68,10 +80,17 @@ function freeRRInstance(rr::Ptr{Nothing})
   end
 end
 
+"""
+    getInstallFolder()
+Returns the folder in which the RoadRunner API is installed.
+"""
 function getInstallFolder()
   str = ccall(dlsym(rrlib, :getInstallFolder), cdecl, Ptr{UInt8}, ())
 end
-
+"""
+    getInstallFolder()
+Set the internal string containing the folder in where the RoadRunner C API is installed.
+"""
 function setInstallFolder(folder::String)
   status = ccall(dlsym(rrlib, :setInstallFolder), cdecl, Bool, (Ptr{UInt8},), folder)
   if status == false
@@ -79,6 +98,10 @@ function setInstallFolder(folder::String)
   end
 end
 
+"""
+    setComputeAndAssignConservationLaws()
+Enable or disable conservation analysis.
+"""
 function setComputeAndAssignConservationLaws(rr::Ptr{Nothing}, OnOrOff::Bool)
   status = ccall(dlsym(rrlib, :setComputeAndAssignConservationLaws), cdecl, Bool, (Ptr{Nothing} , Bool), rr, OnOrOff)
   if status == false
@@ -89,6 +112,12 @@ end
 ###############################################################################
 #                            Read and Write Models                            #
 ###############################################################################
+# RRHandle's type is Ptr{Void}, in JUlia, Void is called Nothing
+
+"""
+    loadSBML()
+Load a model from an SBML string.
+"""
 function loadSBML(rr::Ptr{Nothing}, sbml::String)
   status = ccall(dlsym(rrlib, :loadSBML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, sbml)
   if status == false
@@ -96,13 +125,20 @@ function loadSBML(rr::Ptr{Nothing}, sbml::String)
   end
 end
 
+"""
+    loadSBMLEx()
+Load a model from an SBML string.
+"""
 function loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
   status = ccall(dlsym(rrlib, :loadSBMLEx), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, sbml, forceRecompile)
   if status == false
     error(getLastError())
   end
 end
-
+"""
+    loadSBMLFromFile()
+Load a model from a SBML file.
+"""
 function loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
   status = ccall(dlsym(rrlib, :loadSBMLFromFile), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
   if status == false
@@ -110,6 +146,10 @@ function loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
   end
 end
 
+"""
+    loadSBMLFromFile()
+Load a model from a SBML file, force recompilation.
+"""
 function loadSBMLFromFileE(rr::Nothing, fileName::String, forceRecompile::Bool)
   status = ccall(dlsym(rrlib, :loadSBMLFromFileE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool), rr, fileName, forceRecompile)
   if status == false
@@ -117,6 +157,10 @@ function loadSBMLFromFileE(rr::Nothing, fileName::String, forceRecompile::Bool)
   end
 end
 
+"""
+    clearModel()
+Unload current model.
+"""
 function clearModel(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :clearModel), cdecl, Int8, (Ptr{Nothing}, ), rr)
   if status == false
@@ -124,21 +168,35 @@ function clearModel(rr::Ptr{Nothing})
   end
 end
 
+"""
+    isModelLoaded()
+check if a model is loaded.
+"""
 function isModelLoaded(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
 end
-
+"""
+    loadSimulationSettings(()
+Load simulation settings from a file.
+"""
 function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
   status = call(dlsym(rrlib, :loadSimulationSettings), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
   if status == false
     error(getLastError())
   end
 end
-
-function getCurrentSBML(rr::Ptr{Nothing})
-  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
+"""
+    getCurrentSBM()
+Retrieve the current state of the model in the form of an SBML string.
+"""
+function getCurrentSBML(handle::Ptr{Nothing})
+  return unsafe_string(ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), handle))
 end
 
+"""
+    getSBM()
+Retrieve the SBML model that was last loaded into roadRunner.
+"""
 function getSBML(rr::Ptr{Nothing})
    return unsafe_string(ccall(dlsym(rrlib, :getSBML), Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
@@ -147,54 +205,112 @@ end
 #                          Utilities Functions                               #
 ###############################################################################
 
+"""
+    getAPIVersion()
+Retrieve the current version number of the C API library.
+"""
 function getAPIVersion()
   return unsafe_string(ccall(dlsym(rrlib, :getAPIVersion), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getCPPAPIVersion()
+Retrieve the current version number of the C++ API (Core RoadRunner API) library..
+"""
 function getCPPAPIVersion(rr)
   return unsafe_string(ccall(dlsym(rrlib, :getCPPAPIVersion), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    getVersion()
+Get the version number.
+Returns: the roadrunner version number in the form or 102030 if the number is 1.2.3
+returns the individual version numbers as XXYYZZ where XX is the major version, YY the minor and ZZ the revision, eg 10000, or 10100, 20000 etc
+"""
 function getVersion()
   return ccall(dlsym(rrlib, :getVersion), cdecl, Int64, ())
 end
 
+"""
+    getVersionStr()
+returns roadrunner as a string, i.e. "1.0.0"
+"""
 function getVersionStr()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionStr), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getVersionEx()
+returns something like "1.0.0; compiled with clang "3.3 (tags/RELEASE_33/final)" on date Dec 8 2013, 17:24:57'
+"""
 function getVersionEx()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionEx), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getExtendedAPIInfo()
+Retrieve extended API info. Returns null if it fails, otherwise it returns a string with the info.
+"""
 function getExtendedAPIInfo()
   return unsafe_string(ccall(dlsym(rrlib, :getExtendedAPIInfo), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getBuildDate()
+Retrieve the current build date of the library.
+"""
 function getBuildDate()
   return unsafe_string(ccall(dlsym(rrlib, :getBUildDate), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getBuildTime()
+Retrieve the current build time (HH:MM:SS) of the library.
+"""
 function getBuildTime()
   return unsafe_string(ccall(dlsym(rrlib, :getBuildTime), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getBuildDateTime()
+Retrieve the current build date + time of the library.
+"""
 function getBuildDateTime()
   return unsafe_string(ccall(dlsym(rrlib, :getBuildDateTime), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getCopyright()
+Retrieve the current copyright notice for the library.
+"""
 function getCopyright()
   return unsafe_string(ccall(dlsym(rrlib, :getCopyright), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getInfo()
+Retrieve the current version number of the libSBML library.
+
+"""
 function getInfo(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getInfo), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    getlibSBMLVersion()
+Retrieve info about current state of roadrunner, e.g. loaded model, conservationAnalysis etc.
+
+"""
 function getlibSBMLVersion(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getlibSBMLVersion), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+
+"""
+    setTempFolder()
+Set the path to the temporary folder where the C code will be stored.
+When RoadRunner is run in C generation mode its uses a temporary folder to store the generated C source code. This method can be used to set the temporary folder path if necessary.
+"""
 function setTempFolder(rr::Ptr{Nothing}, folder::String)
   status = ccall(dlsym(rrlib, :setTempFolder), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, folder)
   if status == false
@@ -202,18 +318,34 @@ function setTempFolder(rr::Ptr{Nothing}, folder::String)
   end
 end
 
+"""
+    getTempFolder()
+Retrieve the current temporary folder path. When RoadRunner is run in C generation mode its uses a temporary folder to store the generate C source code. This method can be used to get the current value for the temporary folder path.
+"""
 function getTempFolder(rr::Ptr{Nothing})
   return unsafe_string(ccal(dlsym(rrlib, :getTempFolder), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    getWorkingDirectory()
+Retrieve the current working directory path.
+"""
 function getWorkingDirectory()
   return unsafe_string(ccall(dlsym(rrlib, :getWorkingDirectory), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    getRRCAPILocation()
+Retrieve the directory path of the shared rrCApi library.
+"""
 function getRRCAPILocation()
   return unsafe_string(ccall(dlsym(rrlib, :getRRCAPILocation), cdecl, Ptr{UInt8}, ()))
 end
 
+"""
+    setCompiler())
+Set the path and filename to the compiler to be used by roadrunner.
+"""
 function setCompiler(rr::Ptr{Nothing}, fName::String)
   status = ccall(dlsym(rrlib, :setCompiler), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fName)
   if status == false
@@ -221,10 +353,18 @@ function setCompiler(rr::Ptr{Nothing}, fName::String)
   end
 end
 
+"""
+    getCompiler())
+Get the name of the compiler currently being used by roadrunne.
+"""
 function getCompiler(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCompiler), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    setCompilerLocation()
+Set the path to a folder containing the compiler being used. Returns true if successful
+"""
 function setCompilerLocation(rr::Ptr{Nothing}, folder::String)
   status = ccall(dlsym(rrlib, :setCompilerLocation), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, folder)
   if status == false
@@ -232,10 +372,18 @@ function setCompilerLocation(rr::Ptr{Nothing}, folder::String)
   end
 end
 
+"""
+    getCompilerLocation()
+Get the path to a folder containing the compiler being used. Returns the path if successful, NULL otherwise
+"""
 function getCompilerLocation(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCompilerLocation), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    setSupportCodeFolder()
+Set the path to a folder containing support code for model generation.
+"""
 function setSupportCodeFolder(rr::Ptr{Nothing}, folder::String)
   status = ccall(dlsym(rrlib, :setSupportCodeFolder), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, folder)
   if status == false
@@ -243,10 +391,18 @@ function setSupportCodeFolder(rr::Ptr{Nothing}, folder::String)
   end
 end
 
+"""
+    getSupportCodeFolder()
+Get the path to a folder containing support code.
+"""
 function getSupportCodeFolder(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getSupportCodeFolder), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    setCodeGenerationMode()
+Set the runtime generation option [Not yet implemented]. RoadRunner can either execute a model by generating, compiling and linking self-generated C code or it can employ an internal interpreter to evaluate the model equations. The later method is useful when the OS forbids the compiling of externally generated code.
+"""
 function setCodeGenerationMode(rr::Ptr{Nothing}, mode::Int64)
   status = ccall(dlsym(rrlib, :setCodeGenerationMode), cdecl, Bool, (Ptr{Nothing}, Int64), rr, mode)
   if status == false
