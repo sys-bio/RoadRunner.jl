@@ -16,11 +16,7 @@ antimony_api = joinpath(current_dir, "libantimony.dll")
 
 rrlib = Libdl.dlopen(rr_api)
 antlib = Libdl.dlopen(antimony_api)
-# Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")
 
-# println("this is the value of rrlib outside of the function: ", rrlib)
-#a = 1000
-#k = Array{Float64}(undef, 100)
 include("rrc_utilities_binding.jl")
 include("rrc_types.jl")
 include("antimony_binding.jl")
@@ -30,6 +26,10 @@ include("antimony_binding.jl")
 #   global antlib = Libdl.dlopen("C:/Users/lukez/OneDrive/Desktop/Network Generator/Network-Generator/libantimony.dll")
 # end
 
+"""
+    loada(antString::String)
+Take an antimony string and return a roadrunner instance
+"""
 function loada(antString::String)
   rr = createRRInstance()
   try
