@@ -61,7 +61,7 @@ function createRRInstance()
 end
 
 """
-    createRRInstanceEx()
+    createRRInstanceEx(tempFolder::String, compiler_cstr::String)
 Initialize  and return a new roadRunner instance.
 """
 function createRRInstanceEx(tempFolder::String, compiler_cstr::String)
@@ -158,7 +158,7 @@ function loadSBMLFromFileE(rr::Nothing, fileName::String, forceRecompile::Bool)
 end
 
 """
-    clearModel()
+    clearModel(rr::Ptr{Nothing)
 Unload current model.
 """
 function clearModel(rr::Ptr{Nothing})
@@ -288,10 +288,10 @@ function getBuildDateTime()
 end
 ## Attention: returns null
 """
-    getCopyright()
+    getCopyright(rr::Ptr{Nothing})
 Retrieve the current copyright notice for the library.
 """
-function getCopyright()
+function getCopyright(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCopyright), cdecl, Ptr{UInt8}, ()))
 end
 
@@ -305,7 +305,7 @@ function getInfo(rr::Ptr{Nothing})
 end
 ## Attention: returns null
 """
-    getlibSBMLVersion()
+    getlibSBMLVersion(rr::Ptr{Nothing})
 Retrieve info about current state of roadrunner, e.g. loaded model, conservationAnalysis etc.
 """
 function getlibSBMLVersion(rr::Ptr{Nothing})
@@ -314,7 +314,7 @@ end
 
 
 """
-    setTempFolder()
+    setTempFolder(rr::Ptr{Nothing}, folder::String)
 Set the path to the temporary folder where the C code will be stored.
 When RoadRunner is run in C generation mode it uses a temporary folder to store the generated C source code. This method can be used to set the temporary folder path if necessary.
 """
@@ -327,7 +327,7 @@ end
 
 ## Attention: returns null
 """
-    getTempFolder()
+    getTempFolder(rr::Ptr{Nothing})
 Retrieve the current temporary folder path. When RoadRunner is run in C generation mode it uses a temporary folder to store the generate C source code. This method can be used to get the current value for the temporary folder path.
 """
 function getTempFolder(rr::Ptr{Nothing})
@@ -353,7 +353,7 @@ function getRRCAPILocation()
 end
 
 """
-    setCompiler())
+    setCompiler(rr::Ptr{Nothing}, fName::String)
 Set the path and filename to the compiler to be used by roadrunner.
 """
 function setCompiler(rr::Ptr{Nothing}, fName::String)
@@ -364,7 +364,7 @@ function setCompiler(rr::Ptr{Nothing}, fName::String)
 end
 
 """
-    getCompiler())
+    getCompiler(rr::Ptr{Nothing}))
 Get the name of the compiler currently being used by roadrunner.
 """
 function getCompiler(rr::Ptr{Nothing})
@@ -372,7 +372,7 @@ function getCompiler(rr::Ptr{Nothing})
 end
 
 """
-    setCompilerLocation()
+    setCompilerLocation(rr::Ptr{Nothing}, folder::String)
 Set the path to a folder containing the compiler being used. Returns true if successful
 """
 function setCompilerLocation(rr::Ptr{Nothing}, folder::String)
@@ -384,7 +384,7 @@ end
 
 ## Attention: returns null
 """
-    getCompilerLocation()
+    getCompilerLocation(rr::Ptr{Nothing})
 Get the path to a folder containing the compiler being used. Returns the path if successful, NULL otherwise
 """
 function getCompilerLocation(rr::Ptr{Nothing})
@@ -392,7 +392,7 @@ function getCompilerLocation(rr::Ptr{Nothing})
 end
 
 """
-    setSupportCodeFolder()
+    setSupportCodeFolder(rr::Ptr{Nothing}, folder::String)
 Set the path to a folder containing support code for model generation.
 """
 function setSupportCodeFolder(rr::Ptr{Nothing}, folder::String)
@@ -404,7 +404,7 @@ end
 
 ## Attention: returns null
 """
-    getSupportCodeFolder()
+    getSupportCodeFolder(rr::Ptr{Nothing})
 Get the path to a folder containing support code.
 """
 function getSupportCodeFolder(rr::Ptr{Nothing})
@@ -412,7 +412,7 @@ function getSupportCodeFolder(rr::Ptr{Nothing})
 end
 
 """
-    setCodeGenerationMode()
+    setCodeGenerationMode(rr::Ptr{Nothing}, mode::Int64)
 Set the runtime generation option [Not yet implemented]. RoadRunner can either execute a model by generating, compiling and linking self-generated C code or it can employ an internal interpreter to evaluate the model equations. The later method is useful when the OS forbids the compiling of externally generated code.
 """
 function setCodeGenerationMode(rr::Ptr{Nothing}, mode::Int64)
