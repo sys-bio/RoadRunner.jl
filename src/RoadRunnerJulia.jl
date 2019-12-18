@@ -14,8 +14,8 @@ current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
 antimony_api = joinpath(current_dir, "libantimony.dll")
 
-rrlib = Libdl.dlopen(rr_api)
-antlib = Libdl.dlopen(antimony_api)
+#rrlib = Libdl.dlopen(rr_api)
+#antlib = Libdl.dlopen(antimony_api)
 # Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")
 
 # println("this is the value of rrlib outside of the function: ", rrlib)
@@ -42,7 +42,7 @@ function loada(antString::String)
     freeAll()
     clearPreviousLoads()
   end
-    return rr
+  return rr
 end
 
 ###############################################################################
@@ -1012,6 +1012,8 @@ function setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   if status == false
     error(getLastError())
   end
+end
+
 """"
     getNumberOfBoundarySpecies(rr::Ptr{Nothing})
 Returns the number of boundary species in the model.
