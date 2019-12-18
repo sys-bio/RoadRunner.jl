@@ -1661,56 +1661,117 @@ end
 ###############################################################################
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getFullJacobian(rr::Ptr{Nothing})
+Retrieve the full Jacobian for the current model.
+"""
 function getFullJacobian(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFullJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getReducedJacobian(rr::Ptr{Nothing})
+Retrieve the reduced Jacobian for the current model. setComputeAndAssignConservationLaws (true) must be enabled
+"""
 function getReducedJacobian(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getReducedJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getEigenvalues(rr::Ptr{Nothing})
+Retrieve the eigenvalue matrix for the current model.
+"""
 function getEigenvalues(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getEigenvalues), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getStoichiometryMatrix(rr::Ptr{Nothing})
+Retrieve the stoichiometry matrix for the current model.
+"""
 function getStoichiometryMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getStoichiometryMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getLinkMatrix(rr::Ptr{Nothing})
+Retrieve the Link matrix for the current model.
+"""
 function getLinkMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getLinkMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getNrMatrix(rr::Ptr{Nothing})
+Retrieve the reduced stoichiometry matrix for the current model.
+"""
 function getNrMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNrMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getConservationMatrix(rr::Ptr{Nothing})
+Retrieve the conservation matrix for the current model.
+The conservation laws as describe by row where the columns indicate the species Id.
+"""
 function getConservationMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getConservationMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getL0Matrix(rr::Ptr{Nothing})
+Return the L0 Matrix. L0 is defined such that L0 Nr = N0. L0 forms part of the link matrix, L.
+N0 is the set of linear dependent rows from the lower portion of the reordered stoichiometry matrix.
+"""
 function getL0Matrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getL0Matrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRComplexMatrixHelper
+## Attention Return Null
+""""
+    getEigenVectors(matrix::Ptr{RRComplexMatrix})
+Calculate the eigen-vectors of a square real matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
+The complex matrix returned contains the eigenvectors in the columns, in the same order as LibLA_getEigenValues.
+The right eigenvector v(j) of A satisfies: A * v(j) = lambda(j) * v(j)
+"""
 function getEigenVectors(matrix::Ptr{RRComplexMatrix})
   return ccall(dlsym(rrlib, :getEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
 end
 
 ## RRComplexMatrixHelper
+## Attention Return Null
+""""
+    getZEigenVectors(matrix::Ptr{RRComplexMatrix})
+Calculate the eigen-vectors of a square nonsymmetrix complex matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
+The complex matrix returned contains the eigenvectors in the columns, in the same order as getZEigenValues. The right eigenvector v(j) of A satisfies:
+A * v(j) = lambda(j) * v(j)
+"""
 function getZEigenVectors(matrix::Ptr{RRComplexMatrix})
   return ccall(dlsym(rrlib, :getZEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
 end
 
 ## RRVector
+## Attention Return Null
+""""
+    getConservedSums(rr::Ptr{Nothing})
+Return values for conservation laws using the current initial conditions.
+"""
 function getConservedSums(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getConservedSums), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
