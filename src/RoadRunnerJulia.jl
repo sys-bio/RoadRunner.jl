@@ -1530,6 +1530,11 @@ end
 #                           Stochastic Simulation                             #
 ###############################################################################
 
+
+""""
+    getSeed(rr::Ptr{Nothing})
+Determine the current seed used by the random generator.
+"""
 function getSeed(rr::Ptr{Nothing})
   value = Array{Float32}(undef,1)
   status = ccall(dlsym(rrlib, :getSeed), cdecl, Bool, (Ptr{Nothing}, Ptr{Float32}), rr, value)
@@ -1539,6 +1544,10 @@ function getSeed(rr::Ptr{Nothing})
   return value[1]
 end
 
+""""
+    setSeed(rr::Ptr{Nothing}, result::Float32)
+Determine the current seed used by the random generator.
+"""
 function setSeed(rr::Ptr{Nothing}, result::Float32)
   status = ccall(dlsym(rrlib, :setSeed), cdecl, Bool, (Ptr{Nothing}, Float32), rr, result)
   if status == false
@@ -1547,41 +1556,102 @@ function setSeed(rr::Ptr{Nothing}, result::Float32)
 end
 
 ## RRCDataHelper
+""""
+    gillespie(rr::Ptr{Nothing})
+Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
+"""
 function gillespie(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :gillespie), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
 ## RRCDataHelper
+""""
+    gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
+Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
+"""
 function gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
   return ccall(dlsym(rrlib, :gillespieEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64), rr, timeStart, timeEnd)
 end
 
 ## RRCDataHelper
+""""
+    gillespieOnGrid(rr::Ptr{Nothing})
+Carry out a time-course simulation using the Gillespie algorithm based on the given arguments, time start, time end and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 m = gillespieEx (rrHandle, timeStart, timeEnd);
+"""
 function gillespieOnGrid(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :gillespieOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
 ## RRCDataHelper
+""""
+    gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
+Carry out a time-course simulation using the Gillespie algorithm with fixed step size based on the given arguments, time start, time end, and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 m = gillespieOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints);
+"""
 function gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
   return ccall(dlsym(rrlib, :gillespieOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64), rr, timeStart, timeEnd, numberOfPoints)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
+setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
+Based on the given arguments, time start, time end, and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 int numberOfSimulations = 10;
+    6 m = gillespieMeanOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints, numberOfSimulations);
+"""
 function gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
+setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanSDOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
+Based on the given arguments, time start, time end, number of points, and number of simulations.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 int numberOfSimulations = 10;
+    6 m = gillespieMeanSDOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints, numberOfSimulations);
+"""
 function gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanSDOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
