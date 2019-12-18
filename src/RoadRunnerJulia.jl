@@ -82,11 +82,12 @@ end
 
 """
     getInstallFolder()
-Returns the folder in which the RoadRunner API is installed.
+Return the folder in which the RoadRunner API is installed.
 """
 function getInstallFolder()
   str = ccall(dlsym(rrlib, :getInstallFolder), cdecl, Ptr{UInt8}, ())
 end
+
 """
     getInstallFolder(folder::String)
 Set the internal string containing the folder in where the RoadRunner C API is installed.
@@ -135,6 +136,7 @@ function loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
     error(getLastError())
   end
 end
+
 """
     loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
 Load a model from a SBML file.
@@ -175,6 +177,7 @@ check if a model is loaded.
 function isModelLoaded(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
 end
+
 """
     loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
 Load simulation settings from a file.
@@ -185,6 +188,7 @@ function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
     error(getLastError())
   end
 end
+
 """
     getCurrentSBM(handle::Ptr{Nothing})
 Retrieve the current state of the model in the form of an SBML string.
@@ -226,8 +230,8 @@ end
 """
     getVersion()
 Get the version number.
-Returns: the roadrunner version number in the form or 102030 if the number is 1.2.3
-returns the individual version numbers as XXYYZZ where XX is the major version, YY the minor and ZZ the revision, eg 10000, or 10100, 20000 etc
+Return the roadrunner version number in the form or 102030 if the number is 1.2.3
+return the individual version numbers as XXYYZZ where XX is the major version, YY the minor and ZZ the revision, eg 10000, or 10100, 20000 etc
 """
 function getVersion()
   return ccall(dlsym(rrlib, :getVersion), cdecl, Int64, ())
@@ -235,7 +239,7 @@ end
 
 """
     getVersionStr()
-returns roadrunner as a string, i.e. "1.0.0"
+return roadrunner as a string, i.e. "1.0.0"
 """
 function getVersionStr()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionStr), cdecl, Ptr{UInt8}, ()))
@@ -243,7 +247,7 @@ end
 
 """
     getVersionEx()
-returns something like "1.0.0; compiled with clang "3.3 (tags/RELEASE_33/final)" on date Dec 8 2013, 17:24:57'
+return something like "1.0.0; compiled with clang "3.3 (tags/RELEASE_33/final)" on date Dec 8 2013, 17:24:57'
 """
 function getVersionEx()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionEx), cdecl, Ptr{UInt8}, ()))
@@ -304,6 +308,7 @@ Retrieve the current version number of the libSBML library.
 function getInfo(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getInfo), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
+
 ## Attention: returns null
 """
     getlibSBMLVersion(rr::Ptr{Nothing})
@@ -312,7 +317,6 @@ Retrieve info about current state of roadrunner, e.g. loaded model, conservation
 function getlibSBMLVersion(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getlibSBMLVersion), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
-
 
 """
     setTempFolder(rr::Ptr{Nothing}, folder::String)
@@ -480,6 +484,7 @@ function enableLoggingToFile()
     error(getLastError())
   end
 end
+
 """
     enableLoggingToFileWithPath(path::String)
 Enable logging to a log file with the specified path.
@@ -501,6 +506,7 @@ function disableLoggingToFile()
     error(getLastError())
   end
 end
+
 ## Attention Returns False
 """
     setLogLevel(lvl::String)
@@ -522,6 +528,7 @@ Example str = getLogLevel (void)
 function getLogLevel()
   return unsafe_string(ccall(dlsym(rrlib, :getLogLevel), cdecl, Ptr{UInt8}, ()))
 end
+
  ## Attention Returns Null
 """
     getLogFileName()
@@ -570,6 +577,7 @@ function setValue(rr::Ptr{Nothing}, symbolId::String, value::Float64)
     error(getLastError())
   end
 end
+
 """
     evalModel(rr::Ptr{Nothing})
 Evaluate the current model, that it update all assignments and rates of change. Do not carry out an integration step.
@@ -591,6 +599,7 @@ function getEigenvalueIds(rr::Ptr{Nothing})
   eigenValueIds = convertStringArrayToJuliaArray(data)
   return eigenValueIds
 end
+
 """
     getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
 Obtain the list of all available symbols.
@@ -598,6 +607,7 @@ Obtain the list of all available symbols.
 function getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getAvailableTimeCourseSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
+
 """
     getAvailableSteadyStateSymbols(rr::Ptr{Nothing})
 Obtain the list of all available steady state symbols.
@@ -640,6 +650,7 @@ function setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
      error(getLastError())
    end
 end
+
 """
     setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
 Set the time end for a time course simulation.
@@ -650,6 +661,7 @@ function setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
     error(getLastError())
   end
 end
+
 """
     setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
 Set the number of points to generate in a time course simulation.
@@ -682,6 +694,7 @@ Get the current selection list for simulate(void) or simulateEx(void).
 function getTimeCourseSelectionList(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getTimeCourseSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
+
 """
     simulate(rr::Ptr{Nothing})
 Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
@@ -728,6 +741,7 @@ function simulate_helper(data::Ptr{RRCData})
   end
   return data_arr
 end
+
 """
     oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
 Carry out a one step integration of the model.
@@ -817,6 +831,7 @@ function computeSteadyStateValues(rr::Ptr{Nothing})
     return ssValues
   end
 end
+
 """
     setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
 Set the selection list of the steady state analysis.Use getAvailableTimeCourseSymbols(void) to retrieve the list of all possible symbols.
@@ -916,7 +931,7 @@ end
 ## Attention Returns False
 """
     getRatesOfChange(rr::Ptr{Nothing})
-RRetrieve the vector of rates of change as determined by the current state of the model.
+Retrieve the vector of rates of change as determined by the current state of the model.
 Example: values = getRatesOfChange (RRHandle handle);
 """
 function getRatesOfChange(rr::Ptr{Nothing})
@@ -1016,11 +1031,12 @@ end
 
 """"
     getNumberOfBoundarySpecies(rr::Ptr{Nothing})
-Returns the number of boundary species in the model.
+Return the number of boundary species in the model.
 """
 function getNumberOfBoundarySpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
+
 ## Attention Returns Null
 """"
     getBoundarySpeciesIds(rr::Ptr{Nothing})
@@ -1106,6 +1122,7 @@ function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
 Set the floating species concentration to the vector vec.
@@ -1125,7 +1142,7 @@ end
 
 """"
     getNumberOfFloatingSpecies(rr::Ptr{Nothing})
-Returns the number of floating species in the model.
+Return the number of floating species in the model.
 """
 function getNumberOfFloatingSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1133,7 +1150,7 @@ end
 
 """"
     getNumberOfDependentSpecies(rr::Ptr{Nothing})
-Returns the number of dependent species in the mode.
+Return the number of dependent species in the mode.
 """
 function getNumberOfDependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1141,7 +1158,7 @@ end
 
 """"
     getNumberOfIndependentSpecies(rr::Ptr{Nothing})
-Returns the number of independent species in the model.
+Return the number of independent species in the model.
 """
 function getNumberOfIndependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfIndependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1194,6 +1211,7 @@ Example: vec = getFloatingSpeciesInitialConcentrations (RRHandle handle);
 function getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
+
 ## RRStringArrayHelper
 ## Attention Returns Null
 """"
@@ -1231,6 +1249,7 @@ function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
     error(getLastError())
   end
 end
+
 """"
     getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the global parameter value.
@@ -1243,9 +1262,10 @@ function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     getNumberOfGlobalParameters(rr::Ptr{Nothing})
-Returns the number of global parameters in the model.
+Return the number of global parameters in the model.
 """
 function getNumberOfGlobalParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1287,6 +1307,7 @@ function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the volume for a particular compartment.
@@ -1300,7 +1321,7 @@ end
 
 """"
     getNumberOfCompartments(rr::Ptr{Nothing})
-Returns the number of compartments in the model.
+Return the number of compartments in the model.
 """
 function getNumberOfCompartments(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCompartments), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1350,7 +1371,6 @@ Obtain the list of unscaled flux control coefficient Ids.
 function getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
-
 
 ## RRListHelper
 ## Attention Returns Null
@@ -1437,15 +1457,29 @@ function getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of unscaled flux control coefficients for the current model.
+"""
 function getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of scaled flux control coefficients for the current model.
+"""
 function getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
+""""
+    getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
+Retrieve a single unscaled control coefficient.
+"""
 function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getuCC), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, variable, parameter, value)
@@ -1455,6 +1489,10 @@ function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   return value[1]
 end
 
+""""
+    getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
+Retrieve a single control coefficient.
+"""
 function getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getCC), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, variable, parameter, value)
@@ -1463,7 +1501,10 @@ function getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   end
   return value[1]
 end
-
+""""
+    getEE(rr::Ptr{Nothing}, name::String, species::String)
+Retrieve a single elasticity coefficient.
+"""
 function getEE(rr::Ptr{Nothing}, name::String, species::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getEE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, name, species, value)
@@ -1472,7 +1513,10 @@ function getEE(rr::Ptr{Nothing}, name::String, species::String)
   end
   return value[1]
 end
-
+""""
+    getuEE(rr::Ptr{Nothing}, name::String, species::String)
+Retrieve a single unscaled elasticity coefficient.
+"""
 function getuEE(rr::Ptr{Nothing}, name::String, species::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getuEE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, name, species, value)
