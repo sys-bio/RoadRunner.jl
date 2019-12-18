@@ -1804,12 +1804,23 @@ end
 ###############################################################################
 #                           Linear Algebra Functions                          #
 ###############################################################################
+
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
   return ccall(dlsym(rrlib, :getEigenvaluesMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{RRDoubleMatrix},), rr)
 end
 
 ## RRComplexVectorHelper
+## Attention Return Null
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
   return ccall(dlsym(rrlib, :getEigenvaluesVector), cdecl, Ptr{RRComplexVector}, (Ptr{RRDoubleMatrix},), rr)
 end
