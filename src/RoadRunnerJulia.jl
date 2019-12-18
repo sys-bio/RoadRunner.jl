@@ -1828,6 +1828,11 @@ end
 ###############################################################################
 #                               Reset Methods                                 #
 ###############################################################################
+
+""""
+    resetRR(rr::Ptr{Nothing})
+Reset all variables of the model to their current initial values. Does not change the parameters.
+"""
 function resetRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :reset), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1835,6 +1840,10 @@ function resetRR(rr::Ptr{Nothing})
   end
 end
 
+""""
+    resetAllRR(rr::Ptr{Nothing})
+Reset all variables of the model to their current initial values, and resets all parameters to their original values.
+"""
 function resetAllRR(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :resetAll), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1842,6 +1851,10 @@ function resetAllRR(rr::Ptr{Nothing})
   end
 end
 
+""""
+    resetToOriginRR(rr::Ptr{Nothing})
+Reset the model to the state in which it was first loaded, including initial conditions, variables, and parameters.
+"""
 function resetToOriginRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :resetToOrigin), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
