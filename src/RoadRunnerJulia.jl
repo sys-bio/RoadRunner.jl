@@ -425,11 +425,20 @@ end
 ###############################################################################
 #                      Error Handling Functions                               #
 ###############################################################################
-
+## Atttention Returns false
+"""
+    hasError()
+Check if there is an error string to retrieve. Example: status = hasError (void)
+"""
 function hasError()
   return ccall(dlsym(rrlib, :hasError), cdecl, Bool, ())
 end
 
+## Attention Returns False
+"""
+    getLastError()
+Retrieve the current error string. Example, str = getLastError (void);
+"""
 function getLastError()
   return unsafe_string(ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ()))
 end
@@ -438,6 +447,10 @@ end
 #                         Logging Functionality                               #
 ###############################################################################
 
+"""
+    enableLoggingToConsole()
+Enable logging to console.
+"""
 function enableLoggingToConsole()
   status = ccall(dlsym(rrlib, :enableLoggingToConsole), cdecl, Int8, ())
   if status == false
@@ -445,6 +458,10 @@ function enableLoggingToConsole()
   end
 end
 
+"""
+    disableLoggingToConsole()
+Disable logging to console.
+"""
 function disableLoggingToConsole()
   status = ccall(dlsym(rrlib, :disableLoggingToConsole), cdecl, Bool, ())
   if status == false
@@ -452,13 +469,20 @@ function disableLoggingToConsole()
   end
 end
 
+"""
+    enableLoggingToFile()
+Enable logging to logFile.
+"""
 function enableLoggingToFile()
   status = ccall(dlsym(rrlib, :enableLoggingToFile), cdecl, Bool, ())
   if status == false
     error(getLastError())
   end
 end
-
+"""
+    enableLoggingToFileWithPath(path::String)
+Enable logging to a log file with the specified path.
+"""
 function enableLoggingToFileWithPath(path::String)
   status = ccall(dlsym(rrlib, :enableLoggingToConsole), cdecl, Bool, (Ptr{UInt8},), path)
   if status == false
@@ -466,26 +490,51 @@ function enableLoggingToFileWithPath(path::String)
   end
 end
 
+"""
+    disableLoggingToFile()
+Disable logging to logFile.
+"""
 function disableLoggingToFile()
   status = ccall(dlsym(rrlib, :disableLoggingToFile), cdecl, Bool, ())
   if status == false
     error(getLastError())
   end
 end
-
+## Attention Returns False
+"""
+    setLogLevel(lvl::String)
+Set the logging status level The logging level is determined by the following strings.
+"ANY", "DEBUG5", "DEBUG4", "DEBUG3", "DEBUG2", "DEBUG1", "DEBUG", "INFO", "WARNING", "ERROR"
+Example: setLogLevel ("DEBUG4")
+"""
 function setLogLevel(lvl::String)
   return ccall(dlsym(rrlib, :setLogLevel), cdecl, Int8, (Ptr{UInt8},), lvl)
 end
 
+## Attention Returns Null
+"""
+    getLogLevel()
+Get the logging status level as a pointer to a string. The logging level can be one of the following strings
+"ANY", "DEBUG5", "DEBUG4", "DEBUG3", "DEBUG2", "DEBUG1", "DEBUG", "INFO", "WARNING", "ERROR"
+Example str = getLogLevel (void)
+"""
 function getLogLevel()
   return unsafe_string(ccall(dlsym(rrlib, :getLogLevel), cdecl, Ptr{UInt8}, ()))
 end
-
+ ## Attention Returns Null
+"""
+    getLogFileName()
+Get a pointer to the string that holds the logging file name path. Example: str = getLogFileName (void)
+"""
 function getLogFileName()
   return unsafe_string(ccall(dlsym(rrlib, :getLogFileName), cdecl, Ptr{UInt8}, ()))
 end
 
 ## Todo, enum type
+"""
+    logMsg()
+Create a log message.
+"""
 function logMsg()
 end
 
@@ -493,6 +542,12 @@ end
 ###############################################################################
 #                         Current State of System                             #
 ###############################################################################
+
+"""
+    getValue(rr::Ptr{Nothing}, symbolId::String)
+Get the value for a given symbol, use getAvailableTimeCourseSymbols(void) for a list of symbols.
+Example status = getValue (rrHandle, "S1", &value);
+"""
 function getValue(rr::Ptr{Nothing}, symbolId::String)
   #value = Array{Float64}(undef,1)
   value = Array{Float64}(undef,1)
@@ -503,13 +558,21 @@ function getValue(rr::Ptr{Nothing}, symbolId::String)
   return value[1]
 end
 
+"""
+    setValue(rr::Ptr{Nothing}, symbolId::String, value::Float64)
+Set the value for a given symbol, use getAvailableTimeCourseSymbols(void) for a list of symbols.
+Example: status = setValue (rrHandle, "S1", 0.5);
+"""
 function setValue(rr::Ptr{Nothing}, symbolId::String, value::Float64)
   status = ccall(dlsym(rrlib, :setValue), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Float64), rr, symbolId, value)
   if status == false
     error(getLastError())
   end
 end
-
+"""
+    evalModel(rr::Ptr{Nothing})
+Evaluate the current model, that it update all assignments and rates of change. Do not carry out an integration step.
+"""
 function evalModel(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :evalModel), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -518,49 +581,77 @@ function evalModel(rr::Ptr{Nothing})
 end
 
 ## To test
+"""
+    getEigenvalueIds(rr::Ptr{Nothing})
+Obtain the list of eigenvalue Ids.
+"""
 function getEigenvalueIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getEigenvalueIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   eigenValueIds = convertStringArrayToJuliaArray(data)
   return eigenValueIds
 end
-
+"""
+    getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
+Obtain the list of all available symbols.
+"""
 function getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getAvailableTimeCourseSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
-
+"""
+    getAvailableSteadyStateSymbols(rr::Ptr{Nothing})
+Obtain the list of all available steady state symbols.
+"""
 function getAvailableSteadyStateSymbols(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getAvailableSteadyStateSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
+
 ###############################################################################
 #                         Time Course Simulation                              #
 ###############################################################################
-
+"""
+    setConfigurationXML(rr::Ptr{Nothing}, caps::String)
+Set the simulator's capabilities.
+"""
 function setConfigurationXML(rr::Ptr{Nothing}, caps::String)
   status = ccall(dlsym(rrlib, :setConfigurationXML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, caps)
   if status == false
     error(getLastError())
   end
-end
 
+##Attention Returns Null
+"""
+    getConfigurationXML(rr::Ptr{Nothing})
+Get the simulator's capabilities.
+"""
 function getConfigurationXML(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getConfigurationXML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+"""
+    setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
+Set the time start for a time course simulation.
+"""
 function setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
    status = ccall(dlsym(rrlib, :setTimeStart), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeStart)
    if status == false
      error(getLastError())
    end
 end
-
+"""
+    setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
+Set the time end for a time course simulation.
+"""
 function setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
   status = ccall(dlsym(rrlib, :setTimeEnd), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeEnd)
   if status == false
     error(getLastError())
   end
 end
-
+"""
+    setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
+Set the number of points to generate in a time course simulation.
+"""
 function setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
   status = ccall(dlsym(rrlib, :setNumPoints), cdecl, Bool, (Ptr{Nothing}, Int64), rr, nrPoints)
   if status == false
@@ -568,6 +659,12 @@ function setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
   end
 end
 
+"""
+    setTimeCourseSelectionList(rr::Ptr{Nothing}, list::String)
+Set the selection list for output from simulate(void) or simulateEx(void). Use getAvailableTimeCourseSymbols(void) to retrieve the list of all possible symbols.
+Example: setTimeCourseSelectionList ("Time, S1, J1, J2");
+or setTimeCourseSelectionList ("Time S1 J1 J2")
+"""
 function setTimeCourseSelectionList(rr::Ptr{Nothing}, list::String)
   status = ccall(dlsym(rrlib, :setTimeCourseSelectionList), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
   if status == false
@@ -576,10 +673,17 @@ function setTimeCourseSelectionList(rr::Ptr{Nothing}, list::String)
 end
 
 ## RRStringArray Helper
+"""
+    getTimeCourseSelectionList(rr::Ptr{Nothing})
+Get the current selection list for simulate(void) or simulateEx(void).
+"""
 function getTimeCourseSelectionList(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getTimeCourseSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
-
+"""
+    simulate(rr::Ptr{Nothing})
+Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function simulate(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :simulate), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
   print(data)
@@ -587,11 +691,19 @@ function simulate(rr::Ptr{Nothing})
 end
 
 ## Handle RRCData
+"""
+    getSimulationResult(rr::Ptr{Nothing})
+Retrieve the result of the last simulation.
+"""
 function getSimulationResult(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getSimulationResult), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
 # calls simulateEx
+"""
+    simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
+Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
   data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, steps)
   return simulate_helper(data)
@@ -614,7 +726,11 @@ function simulate_helper(data::Ptr{RRCData})
   end
   return data_arr
 end
-
+"""
+    oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
+Carry out a one step integration of the model.
+Example: status = OneStep (rrHandle, currentTime, timeStep, newTimeStep);
+"""
 function oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :oneStep), cdecl, Bool, (Ptr{Nothing}, Float64, Float64, Ptr{Float64}), rr, currentTime, stepSize, value)
@@ -624,6 +740,10 @@ function oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
   return value[1]
 end
 
+"""
+    getTimeStart(rr::Ptr{Nothing})
+Get the value of the current time start.
+"""
 function getTimeStart(rr::Ptr{Nothing})
   timeStart = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getTimeStart), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, timeStart)
@@ -633,6 +753,11 @@ function getTimeStart(rr::Ptr{Nothing})
   return timeStart[1]
 end
 
+"""
+    getTimeEnd(rr::Ptr{Nothing})
+Get the value of the current time end.
+Example: status = getTimeEnd (rrHandle, &timeEnd);
+"""
 function getTimeEnd(rr::Ptr{Nothing})
   #timeEnd = Array(Float64, 1)
   timeEnd = Array{Float64}(undef,1)
@@ -643,6 +768,11 @@ function getTimeEnd(rr::Ptr{Nothing})
   return timeEnd[1]
 end
 
+"""
+    getNumPoints(rr)
+Get the value of the current number of points.
+Example: status = getNumPoints (rrHandle, &numberOfPoints);
+"""
 function getNumPoints(rr)
   numPoints = Array{Int64}(undef,1)
   status = ccall(dlsym(rrlib, :getNumPoints), cdecl, Bool, (Ptr{Nothing}, Ptr{Int64}), rr, numPoints)
@@ -655,6 +785,12 @@ end
 ###############################################################################
 #                            Steady State Routines                            #
 ###############################################################################
+
+"""
+    steadyState(rr::Ptr{Nothing})
+Compute the steady state of the current model.
+Example: status = steadyState (rrHandle, &closenessToSteadyState);
+"""
 function steadyState(rr::Ptr{Nothing})
   value = Array{Float64}(undef, 1)
   status = ccall(dlsym(rrlib, :steadyState), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, value)
@@ -665,6 +801,11 @@ function steadyState(rr::Ptr{Nothing})
 end
 
 ## RRVectorHelper
+"""
+    computeSteadyStateValues(rr::Ptr{Nothing})
+Compute the steady state of the current model.
+Example: RRVectorHandle values = computeSteadyStateValues (void);
+"""
 function computeSteadyStateValues(rr::Ptr{Nothing})
   rrVector = ccall(dlsym(rrlib, :computeSteadyStateValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
   if rrVector == C_NULL
@@ -674,7 +815,11 @@ function computeSteadyStateValues(rr::Ptr{Nothing})
     return ssValues
   end
 end
-
+"""
+    setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
+Set the selection list of the steady state analysis.Use getAvailableTimeCourseSymbols(void) to retrieve the list of all possible symbols.
+Example:  setSteadyStateSelectionList ("S1, J1, J2") or setSteadyStateSelectionList ("S1 J1 J2")
+"""
 function setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
   status = ccall(dlsym(rrlib, :setSteadyStateSelectionList), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
   if status == false
@@ -683,6 +828,11 @@ function setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
 end
 
 ## RRStringArray Helper
+## Attention Returns Null
+"""
+    getSteadyStateSelectionList(rr::Ptr{Nothing})
+Get the selection list for the steady state analysis.
+"""
 function getSteadyStateSelectionList(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getSteadyStateSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
@@ -691,10 +841,18 @@ end
 #                               Reaction Group                                #
 ###############################################################################
 
+"""
+    getNumberOfReactions(rr::Ptr{Nothing})
+Obtain the number of reactions in the loaded model. Example: number = getNumberOfReactions (RRHandle handle);
+"""
 function getNumberOfReactions(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfReactions), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+"""
+    getReactionRate(rr::Ptr{Nothing}, idx::Int64)
+Retrieve a give reaction rate as indicated by the index paramete.
+"""
 function getReactionRate(rr::Ptr{Nothing}, idx::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getReactionRate), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, rateNr, value)
@@ -705,16 +863,32 @@ function getReactionRate(rr::Ptr{Nothing}, idx::Int64)
 end
 
 ### RRVector Helper
+## Attention Returns NUll
+"""
+    getReactionRates(rr::Ptr{Nothing})
+Retrieve a vector of reaction rates as determined by the current state of the model.
+"""
 function getReactionRates(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getReactionRates), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
 ### RRVector Helper
+## Attention Returns Null
+
+"""
+    getReactionRatesEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+Retrieve a vector of reaction rates given a vector of species concentrations.
+"""
 function getReactionRatesEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   return_vec = call(dlsym(rrlib, :getReactionRatesEx), cdecl, Ptr{RRVector}, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
   return return_vec
 end
 
+## Attention Returns Null
+"""
+    getReactionIds(rr::Ptr{Nothing})
+Obtain the list of reaction Ids.
+"""
 function getReactionIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getReactionIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
   num_rxns = getNumberOfReactions(rr)
@@ -736,16 +910,32 @@ end
 ###############################################################################
 
 
-### RRVector Helper
+### RRVector
+## Attention Returns False
+"""
+    getRatesOfChange(rr::Ptr{Nothing})
+RRetrieve the vector of rates of change as determined by the current state of the model.
+Example: values = getRatesOfChange (RRHandle handle);
+"""
 function getRatesOfChange(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getRatesOfChange), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
 ### RRVector Helper
+"""
+    getRatesOfChange(rr::Ptr{Nothing})
+Retrieve the rate of change for a given floating species.
+Example: status = getRateOfChange (&index, *value);
+"""
 function getRatesOfChangeIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getRatesOfChangeIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
+"""
+    getRatesOfChange(rr::Ptr{Nothing})
+Retrieve the rate of change for a given floating species.
+Example: status = getRateOfChange (&index, *value);
+"""
 function getRateOfChange(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib :getRateOfChange), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, inde, value)
@@ -756,6 +946,12 @@ function getRateOfChange(rr::Ptr{Nothing}, index::Int64)
 end
 
 ## RRVector Helper
+## Attention Returns Null
+"""
+    getRatesOfChangeEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+Retrieve the vector of rates of change given a vector of floating species concentrations.
+Example: values = getRatesOfChangeEx (vector);
+"""
 function getRatesOfChangeEx(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   return ccall(dlsym(rrlib, :getRatesOfChangeEx), cdecl, Ptr{Nothing}, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
 end
@@ -765,10 +961,19 @@ end
 ###############################################################################
 
 ## RRVectorHelper
+## Attention Returns False
+""""
+    getBoundarySpeciesConcentrations(rr::Ptr{Nothing})
+Retrieve the concentration for a particular floating species.
+"""
 function getBoundarySpeciesConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getBoundarySpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
+""""
+    setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+Set the concentration for a particular boundary species.
+"""
 function setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -776,6 +981,10 @@ function setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
   end
 end
 
+""""
+    getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
+Retrieve the concentration for a particular floating species.
+"""
 function getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
@@ -786,17 +995,33 @@ function getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
 end
 
 ## RRVectorHelper
+""""
+    setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+Set the boundary species concentration to the vector vec.
+Example:
+    1 myVector = createVector (getNumberOfBoundarySpecies(RRHandle handle));
+    2 setVectorElement (myVector, 0, 1.2);
+    3 setVectorElement (myVector, 1, 5.7);
+    4 setVectorElement (myVector, 2, 3.4);
+    5 setBoundarySpeciesConcentrations(myVector);
+"""
 function setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
   if status == false
     error(getLastError())
   end
-end
-
+""""
+    getNumberOfBoundarySpecies(rr::Ptr{Nothing})
+Returns the number of boundary species in the model.
+"""
 function getNumberOfBoundarySpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
-
+## Attention Returns Null
+""""
+    getBoundarySpeciesIds(rr::Ptr{Nothing})
+Obtain the list of boundary species Ids.
+"""
 function getBoundarySpeciesIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getBoundarySpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   b_species = String[]
@@ -818,10 +1043,20 @@ end
 ###############################################################################
 
 ## RRVectorHelper
+
+""""
+    getFloatingSpeciesConcentrations(rr::Ptr{Nothing})
+Retrieve in a vector the concentrations for all the floating species.
+Example:  RVectorPtr values = getFloatingSpeciesConcentrations (void);
+"""
 function getFloatingSpeciesConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFloatingSpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
+""""
+    setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+Set the initial concentration for a particular floating species.
+"""
 function setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = call(dlsym(rrlib, :setFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -829,6 +1064,11 @@ function setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::
   end
 end
 
+## Attention Returns False
+""""
+    getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64)
+Get the initial concentration for a particular floating species.
+"""
 function getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Floating64}(undef,1)
   status = ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
@@ -838,6 +1078,10 @@ function getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::
   return value[1]
 end
 
+""""
+    setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+Set the concentration for a particular floating species.
+"""
 function setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setFloatingSpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -845,6 +1089,11 @@ function setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
   end
 end
 
+## Attention Returns False
+""""
+    getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
+Retrieve the concentration for a particular floating species.
+"""
 function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getFloatingSpeciesByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
@@ -853,7 +1102,16 @@ function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
-
+""""
+    setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+Set the floating species concentration to the vector vec.
+Example:
+    1 myVector = createVector (getNumberOfFloatingSpecies(RRHandle handle));
+    2 setVectorElement (myVector, 0, 1.2);
+    3 setVectorElement (myVector, 1, 5.7);
+    4 setVectorElement (myVector, 2, 3.4);
+    5 setFloatingSpeciesConcentrations(myVector);
+"""
 function setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
   if status == false
@@ -861,18 +1119,35 @@ function setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   end
 end
 
+""""
+    getNumberOfFloatingSpecies(rr::Ptr{Nothing})
+Returns the number of floating species in the model.
+"""
 function getNumberOfFloatingSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+""""
+    getNumberOfDependentSpecies(rr::Ptr{Nothing})
+Returns the number of dependent species in the mode.
+"""
 function getNumberOfDependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+""""
+    getNumberOfIndependentSpecies(rr::Ptr{Nothing})
+Returns the number of independent species in the model.
+"""
 function getNumberOfIndependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfIndependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+## Attention Returns Null
+""""
+    getFloatingSpeciesIds(rr::Ptr{Nothing})
+Obtain the list of floating species Id.
+"""
 function getFloatingSpeciesIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getFloatingSpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   species = String[]
@@ -893,6 +1168,11 @@ end
 #                           Intial Conditions Group                           #
 ###############################################################################
 
+""""
+    setFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
+Set the initial floating species concentrations.
+Example: status = setFloatingSpeciesInitialConcentrations (vec);
+"""
 function setFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrations), cdecl, Bool, (Ptr{Nothing}, Ptr{RRVector}), rr, vec)
   if status == false
@@ -901,11 +1181,22 @@ function setFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVe
 end
 
 ## RRVectorHelper
+## Attention Returns Null
+""""
+    getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
+Get the initial floating species concentrations.
+Example: vec = getFloatingSpeciesInitialConcentrations (RRHandle handle);
+"""
 function getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
-
 ## RRStringArrayHelper
+## Attention Returns Null
+""""
+    getFloatingSpeciesInitialConditionIds(rr::Ptr{Nothing})
+Get the initial floating species Ids.
+Example: vec = getFloatingSpeciesInitialConditionIds (RRHandle handle);
+"""
 function getFloatingSpeciesInitialConditionIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getFloatingSpeciesInitialConditionIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   return data
@@ -916,17 +1207,30 @@ end
 ###############################################################################
 
 ## RRVectorHelper
+## Attention Returns False
+""""
+    getGlobalParameterValues(rr::Ptr{Nothing})
+Retrieve the global parameter value.
+Example: RRVectorPtr values = getGlobalParameterValues (void);
+"""
 function getGlobalParameterValues(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getGlobalParameterValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
+""""
+    setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+Set the value for a particular global parameter.
+"""
 function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setGlobalParameterByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
     error(getLastError())
   end
 end
-
+""""
+    getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
+Retrieve the global parameter value.
+"""
 function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getGlobalParameterByIndex ), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
@@ -935,11 +1239,19 @@ function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
-
+""""
+    getNumberOfGlobalParameters(rr::Ptr{Nothing})
+Returns the number of global parameters in the model.
+"""
 function getNumberOfGlobalParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+## Attention Returns Null
+""""
+    getGlobalParameterIds(rr::Ptr{Nothing})
+Obtain the list of global parameter Ids.
+"""
 function getGlobalParameterIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   global_params = String[]
@@ -959,7 +1271,10 @@ end
 ###############################################################################
 #                              Compartment Group                              #
 ###############################################################################
-
+""""
+    getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
+Retrieve the compartment volume for a particular compartment.
+"""
 function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib :getCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
@@ -968,7 +1283,10 @@ function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
-
+""""
+    setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
+Set the volume for a particular compartment.
+"""
 function setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -976,10 +1294,19 @@ function setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   end
 end
 
+""""
+    getNumberOfCompartments(rr::Ptr{Nothing})
+Returns the number of compartments in the model.
+"""
 function getNumberOfCompartments(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCompartments), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
+""""
+    getCompartmentIds(rr::Ptr{Nothing})
+Obtain the list of compartment Ids.
+Example: str = getCompartmentIds (RRHandle handle);
+"""
 function getCompartmentIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getCompartmentIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   compartmentIds = String[]
