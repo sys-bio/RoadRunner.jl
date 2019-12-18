@@ -286,6 +286,7 @@ Retrieve the current build date + time of the library.
 function getBuildDateTime()
   return unsafe_string(ccall(dlsym(rrlib, :getBuildDateTime), cdecl, Ptr{UInt8}, ()))
 end
+
 ## Attention: returns null
 """
     getCopyright(rr::Ptr{Nothing})
@@ -618,6 +619,7 @@ function setConfigurationXML(rr::Ptr{Nothing}, caps::String)
   if status == false
     error(getLastError())
   end
+end
 
 ##Attention Returns Null
 """
@@ -1328,42 +1330,81 @@ end
 ###############################################################################
 
 ## RRListHelper
+## Attention Return Null
+""""
+    getElasticityCoefficientIds(rr::Ptr{Nothing})
+Obtain the list of elasticity coefficient Ids.
+"""
 function getElasticityCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getElasticityCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
 ## RRListHelper
+## Attention Returns Null
+""""
+    getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
+Obtain the list of unscaled flux control coefficient Ids.
+"""
 function getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
 
 ## RRListHelper
+## Attention Returns Null
+""""
+    getFluxControlCoefficientIds(rr::Ptr{Nothing})
+Obtain the list of flux control coefficient Ids.
+"""
 function getFluxControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
 ## RRListHelper
+## Attention Returns Null
+""""
+    getUnscaledConcentrationControlCoefficientIds(rr::Ptr{Nothing})
+Obtain the list of unscaled concentration control coefficient Ids.
+"""
 function getUnscaledConcentrationControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledConcentrationControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
 ## RRListHelper
+# Attention Returns Null
+""""
+    getConcentrationControlCoefficientIds(rr::Ptr{Nothing})
+Obtain the list of concentration coefficient Ids.
+"""
 function getConcentrationControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getConcentrationControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Returns Null
+""""
+    getUnscaledElasticityMatrix(rr::Ptr{Nothing})
+Retrieve the unscaled elasticity matrix for the current model.
+"""
 function getUnscaledElasticityMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Returns Null
+""""
+    getScaledElasticityMatrix(rr::Ptr{Nothing})
+Retrieve the scaled elasticity matrix for the current model.
+"""
+
 function getScaledElasticityMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
-
+""""
+    getScaledFloatingSpeciesElasticity(rr::Ptr{Nothing}, reactionId::String, speciesId::String)
+Retrieve the scaled elasticity matrix for the current model.
+"""
 function getScaledFloatingSpeciesElasticity(rr::Ptr{Nothing}, reactionId::String, speciesId::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getScaledFloatingSpeciesElasticity), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, reactionId, speciesId, value)
@@ -1374,11 +1415,21 @@ function getScaledFloatingSpeciesElasticity(rr::Ptr{Nothing}, reactionId::String
 end
 
 ## RRDoubleMatrixHelper
+## Attention Returns Null
+""""
+    getUnscaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of unscaled concentration control coefficients for the current model.
+"""
 function getUnscaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledConcentrationControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Returns Null
+""""
+    getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of scaled concentration control coefficients for the current model.
+"""
 function getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledConcentrationControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
