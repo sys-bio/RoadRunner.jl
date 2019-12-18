@@ -1780,6 +1780,10 @@ end
 #                      Network Object Model Functions                         #
 ###############################################################################
 
+""""
+    getNumberOfRules(rr::Ptr{Nothing})
+Return the number of rules in the current model.
+"""
 function getNumberOfRules(rr::Ptr{Nothing})
   result = ccall(dlsym(rrlib, :getConservedSums), cdecl, Cint, (Ptr{Nothing},), rr)
   if result == -1
@@ -1788,6 +1792,11 @@ function getNumberOfRules(rr::Ptr{Nothing})
 end
 
 ## could return null, error checking
+## Attention Return Null
+""""
+    getModelName(rr::Ptr{Nothing})
+Return the name of currently loaded SBML model.
+"""
 function getModelName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getModelName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
