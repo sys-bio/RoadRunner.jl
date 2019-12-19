@@ -2401,6 +2401,10 @@ end
 #                        Configuration Keys and Values                        #
 ###############################################################################
 
+""""
+    setConfigBool(key::String, value::Bool)
+    Set a boolean configuration value.
+"""
 function setConfigBool(key::String, value::Bool)
     status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
     println(status)
@@ -2414,10 +2418,18 @@ function setConfigBool(key::String, value::Bool)
     return status
 end
 
+""""
+    getConfigBool(key::String)
+Get a boolean configuration value.
+"""
 function getConfigBool(key::String)
   return ccall(dlsym(rrlib, :getConfigBool), cdecl, Bool, (Ptr{UInt8},), key)
 end
 
+""""
+    setConfigInt(key::String, value::Int64)
+Set an integer configuration value.
+"""
 function setConfigInt(key::String, value::Int64)
     status = ccall(dlsym(rrlib, :setConfigInt), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
     println(status)
@@ -2426,10 +2438,18 @@ function setConfigInt(key::String, value::Int64)
     end
 end
 
+""""
+    getConfigInt(key::String)
+Get an integer configuration value.
+"""
 function getConfigInt(key::String)
   return ccall(dlsym(rrlib, :getConfigInt), cdecl, Int64, (Ptr{UInt8},), key)
 end
 
+""""
+    setConfigDouble(key::String, value::Float64)
+Set a double configuration value.
+"""
 function setConfigDouble(key::String, value::Float64)
   status = ccall(dlsym(rrlib, :setConfigDouble), cdecl, Bool, (Ptr{UInt8}, Cdouble), key, value)
   if status == false
@@ -2437,10 +2457,18 @@ function setConfigDouble(key::String, value::Float64)
   end
 end
 
+""""
+    getConfigDouble(key::String)
+Get a double configuration value.
+"""
 function getConfigDouble(key::String)
   return ccall(dlsym(rrlib, :getConfigDouble), cdecl, Float64, (Ptr{UInt8},), key)
 end
 
+""""
+    getListOfConfigKeys()
+Get a list of all possible config keys.
+"""
 function getListOfConfigKeys()
   config_keys = String[]
   str_arr = ccall(dlsym(rrlib, :getListOfConfigKeys), cdecl, Ptr{RRStringArray}, ())
