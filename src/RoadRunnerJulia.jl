@@ -82,11 +82,12 @@ end
 
 """
     getInstallFolder()
-Returns the folder in which the RoadRunner API is installed.
+Return the folder in which the RoadRunner API is installed.
 """
 function getInstallFolder()
   str = ccall(dlsym(rrlib, :getInstallFolder), cdecl, Ptr{UInt8}, ())
 end
+
 """
     getInstallFolder(folder::String)
 Set the internal string containing the folder in where the RoadRunner C API is installed.
@@ -135,6 +136,7 @@ function loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
     error(getLastError())
   end
 end
+
 """
     loadSBMLFromFile(rr::Ptr{Nothing}, fileName::String)
 Load a model from a SBML file.
@@ -175,6 +177,7 @@ check if a model is loaded.
 function isModelLoaded(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
 end
+
 """
     loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
 Load simulation settings from a file.
@@ -185,6 +188,7 @@ function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
     error(getLastError())
   end
 end
+
 """
     getCurrentSBM(handle::Ptr{Nothing})
 Retrieve the current state of the model in the form of an SBML string.
@@ -226,8 +230,8 @@ end
 """
     getVersion()
 Get the version number.
-Returns: the roadrunner version number in the form or 102030 if the number is 1.2.3
-returns the individual version numbers as XXYYZZ where XX is the major version, YY the minor and ZZ the revision, eg 10000, or 10100, 20000 etc
+Return the roadrunner version number in the form or 102030 if the number is 1.2.3
+return the individual version numbers as XXYYZZ where XX is the major version, YY the minor and ZZ the revision, eg 10000, or 10100, 20000 etc
 """
 function getVersion()
   return ccall(dlsym(rrlib, :getVersion), cdecl, Int64, ())
@@ -235,7 +239,7 @@ end
 
 """
     getVersionStr()
-returns roadrunner as a string, i.e. "1.0.0"
+return roadrunner as a string, i.e. "1.0.0"
 """
 function getVersionStr()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionStr), cdecl, Ptr{UInt8}, ()))
@@ -243,7 +247,7 @@ end
 
 """
     getVersionEx()
-returns something like "1.0.0; compiled with clang "3.3 (tags/RELEASE_33/final)" on date Dec 8 2013, 17:24:57'
+return something like "1.0.0; compiled with clang "3.3 (tags/RELEASE_33/final)" on date Dec 8 2013, 17:24:57'
 """
 function getVersionEx()
   return unsafe_string(ccall(dlsym(rrlib, :getVersionEx), cdecl, Ptr{UInt8}, ()))
@@ -304,6 +308,7 @@ Retrieve the current version number of the libSBML library.
 function getInfo(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getInfo), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
+
 ## Attention: returns null
 """
     getlibSBMLVersion(rr::Ptr{Nothing})
@@ -312,7 +317,6 @@ Retrieve info about current state of roadrunner, e.g. loaded model, conservation
 function getlibSBMLVersion(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getlibSBMLVersion), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
-
 
 """
     setTempFolder(rr::Ptr{Nothing}, folder::String)
@@ -480,6 +484,7 @@ function enableLoggingToFile()
     error(getLastError())
   end
 end
+
 """
     enableLoggingToFileWithPath(path::String)
 Enable logging to a log file with the specified path.
@@ -501,6 +506,7 @@ function disableLoggingToFile()
     error(getLastError())
   end
 end
+
 ## Attention Returns False
 """
     setLogLevel(lvl::String)
@@ -522,6 +528,7 @@ Example str = getLogLevel (void)
 function getLogLevel()
   return unsafe_string(ccall(dlsym(rrlib, :getLogLevel), cdecl, Ptr{UInt8}, ()))
 end
+
  ## Attention Returns Null
 """
     getLogFileName()
@@ -570,6 +577,7 @@ function setValue(rr::Ptr{Nothing}, symbolId::String, value::Float64)
     error(getLastError())
   end
 end
+
 """
     evalModel(rr::Ptr{Nothing})
 Evaluate the current model, that it update all assignments and rates of change. Do not carry out an integration step.
@@ -591,6 +599,7 @@ function getEigenvalueIds(rr::Ptr{Nothing})
   eigenValueIds = convertStringArrayToJuliaArray(data)
   return eigenValueIds
 end
+
 """
     getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
 Obtain the list of all available symbols.
@@ -598,6 +607,7 @@ Obtain the list of all available symbols.
 function getAvailableTimeCourseSymbols(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getAvailableTimeCourseSymbols), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
+
 """
     getAvailableSteadyStateSymbols(rr::Ptr{Nothing})
 Obtain the list of all available steady state symbols.
@@ -640,6 +650,7 @@ function setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
      error(getLastError())
    end
 end
+
 """
     setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
 Set the time end for a time course simulation.
@@ -650,6 +661,7 @@ function setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
     error(getLastError())
   end
 end
+
 """
     setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
 Set the number of points to generate in a time course simulation.
@@ -682,6 +694,7 @@ Get the current selection list for simulate(void) or simulateEx(void).
 function getTimeCourseSelectionList(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getTimeCourseSelectionList), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
+
 """
     simulate(rr::Ptr{Nothing})
 Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
@@ -728,6 +741,7 @@ function simulate_helper(data::Ptr{RRCData})
   end
   return data_arr
 end
+
 """
     oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
 Carry out a one step integration of the model.
@@ -817,6 +831,7 @@ function computeSteadyStateValues(rr::Ptr{Nothing})
     return ssValues
   end
 end
+
 """
     setSteadyStateSelectionList(rr::Ptr{Nothing}, list::String)
 Set the selection list of the steady state analysis.Use getAvailableTimeCourseSymbols(void) to retrieve the list of all possible symbols.
@@ -916,7 +931,7 @@ end
 ## Attention Returns False
 """
     getRatesOfChange(rr::Ptr{Nothing})
-RRetrieve the vector of rates of change as determined by the current state of the model.
+Retrieve the vector of rates of change as determined by the current state of the model.
 Example: values = getRatesOfChange (RRHandle handle);
 """
 function getRatesOfChange(rr::Ptr{Nothing})
@@ -1016,11 +1031,12 @@ end
 
 """"
     getNumberOfBoundarySpecies(rr::Ptr{Nothing})
-Returns the number of boundary species in the model.
+Return the number of boundary species in the model.
 """
 function getNumberOfBoundarySpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
+
 ## Attention Returns Null
 """"
     getBoundarySpeciesIds(rr::Ptr{Nothing})
@@ -1106,6 +1122,7 @@ function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
 Set the floating species concentration to the vector vec.
@@ -1125,7 +1142,7 @@ end
 
 """"
     getNumberOfFloatingSpecies(rr::Ptr{Nothing})
-Returns the number of floating species in the model.
+Return the number of floating species in the model.
 """
 function getNumberOfFloatingSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1133,7 +1150,7 @@ end
 
 """"
     getNumberOfDependentSpecies(rr::Ptr{Nothing})
-Returns the number of dependent species in the mode.
+Return the number of dependent species in the mode.
 """
 function getNumberOfDependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1141,7 +1158,7 @@ end
 
 """"
     getNumberOfIndependentSpecies(rr::Ptr{Nothing})
-Returns the number of independent species in the model.
+Return the number of independent species in the model.
 """
 function getNumberOfIndependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfIndependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1194,6 +1211,7 @@ Example: vec = getFloatingSpeciesInitialConcentrations (RRHandle handle);
 function getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFloatingSpeciesInitialConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
+
 ## RRStringArrayHelper
 ## Attention Returns Null
 """"
@@ -1231,6 +1249,7 @@ function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
     error(getLastError())
   end
 end
+
 """"
     getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the global parameter value.
@@ -1243,9 +1262,10 @@ function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     getNumberOfGlobalParameters(rr::Ptr{Nothing})
-Returns the number of global parameters in the model.
+Return the number of global parameters in the model.
 """
 function getNumberOfGlobalParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1287,6 +1307,7 @@ function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   end
   return value[1]
 end
+
 """"
     setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the volume for a particular compartment.
@@ -1300,7 +1321,7 @@ end
 
 """"
     getNumberOfCompartments(rr::Ptr{Nothing})
-Returns the number of compartments in the model.
+Return the number of compartments in the model.
 """
 function getNumberOfCompartments(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCompartments), cdecl, Int64, (Ptr{Nothing},), rr)
@@ -1350,7 +1371,6 @@ Obtain the list of unscaled flux control coefficient Ids.
 function getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientIds), cdecl, Ptr{RRList}, (Ptr{Nothing},), rr)
 end
-
 
 ## RRListHelper
 ## Attention Returns Null
@@ -1437,15 +1457,29 @@ function getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of unscaled flux control coefficients for the current model.
+"""
 function getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getUnscaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
+Retrieve the matrix of scaled flux control coefficients for the current model.
+"""
 function getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
+""""
+    getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
+Retrieve a single unscaled control coefficient.
+"""
 function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getuCC), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, variable, parameter, value)
@@ -1455,6 +1489,10 @@ function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   return value[1]
 end
 
+""""
+    getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
+Retrieve a single control coefficient.
+"""
 function getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getCC), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, variable, parameter, value)
@@ -1463,7 +1501,10 @@ function getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   end
   return value[1]
 end
-
+""""
+    getEE(rr::Ptr{Nothing}, name::String, species::String)
+Retrieve a single elasticity coefficient.
+"""
 function getEE(rr::Ptr{Nothing}, name::String, species::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getEE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, name, species, value)
@@ -1472,7 +1513,10 @@ function getEE(rr::Ptr{Nothing}, name::String, species::String)
   end
   return value[1]
 end
-
+""""
+    getuEE(rr::Ptr{Nothing}, name::String, species::String)
+Retrieve a single unscaled elasticity coefficient.
+"""
 function getuEE(rr::Ptr{Nothing}, name::String, species::String)
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getuEE), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{Float64}), rr, name, species, value)
@@ -1486,6 +1530,11 @@ end
 #                           Stochastic Simulation                             #
 ###############################################################################
 
+
+""""
+    getSeed(rr::Ptr{Nothing})
+Determine the current seed used by the random generator.
+"""
 function getSeed(rr::Ptr{Nothing})
   value = Array{Float32}(undef,1)
   status = ccall(dlsym(rrlib, :getSeed), cdecl, Bool, (Ptr{Nothing}, Ptr{Float32}), rr, value)
@@ -1495,6 +1544,10 @@ function getSeed(rr::Ptr{Nothing})
   return value[1]
 end
 
+""""
+    setSeed(rr::Ptr{Nothing}, result::Float32)
+Determine the current seed used by the random generator.
+"""
 function setSeed(rr::Ptr{Nothing}, result::Float32)
   status = ccall(dlsym(rrlib, :setSeed), cdecl, Bool, (Ptr{Nothing}, Float32), rr, result)
   if status == false
@@ -1503,41 +1556,102 @@ function setSeed(rr::Ptr{Nothing}, result::Float32)
 end
 
 ## RRCDataHelper
+""""
+    gillespie(rr::Ptr{Nothing})
+Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
+"""
 function gillespie(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :gillespie), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
 ## RRCDataHelper
+""""
+    gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
+Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
+"""
 function gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
   return ccall(dlsym(rrlib, :gillespieEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64), rr, timeStart, timeEnd)
 end
 
 ## RRCDataHelper
+""""
+    gillespieOnGrid(rr::Ptr{Nothing})
+Carry out a time-course simulation using the Gillespie algorithm based on the given arguments, time start, time end and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 m = gillespieEx (rrHandle, timeStart, timeEnd);
+"""
 function gillespieOnGrid(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :gillespieOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
 end
 
 ## RRCDataHelper
+""""
+    gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
+Carry out a time-course simulation using the Gillespie algorithm with fixed step size based on the given arguments, time start, time end, and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 m = gillespieOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints);
+"""
 function gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
   return ccall(dlsym(rrlib, :gillespieOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64), rr, timeStart, timeEnd, numberOfPoints)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
+setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
+Based on the given arguments, time start, time end, and number of points.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 int numberOfSimulations = 10;
+    6 m = gillespieMeanOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints, numberOfSimulations);
+"""
 function gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
+setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
+"""
 function gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanSDOnGrid), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Int64), rr, numberOfSimulations)
 end
 
 ## RRCDataHelper
+""""
+    gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
+Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
+Based on the given arguments, time start, time end, number of points, and number of simulations.
+Example:
+    1 RRCDataPtr m;
+    2 double timeStart = 0.0;
+    3 double timeEnd = 25;
+    4 int numberOfPoints = 200;
+    5 int numberOfSimulations = 10;
+    6 m = gillespieMeanSDOnGridEx (rrHandle, timeStart, timeEnd, numberOfPoints, numberOfSimulations);
+"""
 function gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
   return ccall(dlsym(rrlib, :gillespieMeanSDOnGridEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Float64, Float64, Int64, Int64), rr, timeStart, timeEnd, numberOfPoints, numberOfSimulations)
 end
@@ -1547,56 +1661,117 @@ end
 ###############################################################################
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getFullJacobian(rr::Ptr{Nothing})
+Retrieve the full Jacobian for the current model.
+"""
 function getFullJacobian(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFullJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getReducedJacobian(rr::Ptr{Nothing})
+Retrieve the reduced Jacobian for the current model. setComputeAndAssignConservationLaws (true) must be enabled
+"""
 function getReducedJacobian(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getReducedJacobian), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getEigenvalues(rr::Ptr{Nothing})
+Retrieve the eigenvalue matrix for the current model.
+"""
 function getEigenvalues(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getEigenvalues), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getStoichiometryMatrix(rr::Ptr{Nothing})
+Retrieve the stoichiometry matrix for the current model.
+"""
 function getStoichiometryMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getStoichiometryMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getLinkMatrix(rr::Ptr{Nothing})
+Retrieve the Link matrix for the current model.
+"""
 function getLinkMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getLinkMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getNrMatrix(rr::Ptr{Nothing})
+Retrieve the reduced stoichiometry matrix for the current model.
+"""
 function getNrMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNrMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getConservationMatrix(rr::Ptr{Nothing})
+Retrieve the conservation matrix for the current model.
+The conservation laws as describe by row where the columns indicate the species Id.
+"""
 function getConservationMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getConservationMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getL0Matrix(rr::Ptr{Nothing})
+Return the L0 Matrix. L0 is defined such that L0 Nr = N0. L0 forms part of the link matrix, L.
+N0 is the set of linear dependent rows from the lower portion of the reordered stoichiometry matrix.
+"""
 function getL0Matrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getL0Matrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRComplexMatrixHelper
+## Attention Return Null
+""""
+    getEigenVectors(matrix::Ptr{RRComplexMatrix})
+Calculate the eigen-vectors of a square real matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
+The complex matrix returned contains the eigenvectors in the columns, in the same order as LibLA_getEigenValues.
+The right eigenvector v(j) of A satisfies: A * v(j) = lambda(j) * v(j)
+"""
 function getEigenVectors(matrix::Ptr{RRComplexMatrix})
   return ccall(dlsym(rrlib, :getEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
 end
 
 ## RRComplexMatrixHelper
+## Attention Return Null
+""""
+    getZEigenVectors(matrix::Ptr{RRComplexMatrix})
+Calculate the eigen-vectors of a square nonsymmetrix complex matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
+The complex matrix returned contains the eigenvectors in the columns, in the same order as getZEigenValues. The right eigenvector v(j) of A satisfies:
+A * v(j) = lambda(j) * v(j)
+"""
 function getZEigenVectors(matrix::Ptr{RRComplexMatrix})
   return ccall(dlsym(rrlib, :getZEigenVectors), cdecl, Ptr{RRComplexMatrix}, (Ptr{RRComplexMatrix},), rr)
 end
 
 ## RRVector
+## Attention Return Null
+""""
+    getConservedSums(rr::Ptr{Nothing})
+Return values for conservation laws using the current initial conditions.
+"""
 function getConservedSums(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getConservedSums), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
@@ -1605,6 +1780,10 @@ end
 #                      Network Object Model Functions                         #
 ###############################################################################
 
+""""
+    getNumberOfRules(rr::Ptr{Nothing})
+Return the number of rules in the current model.
+"""
 function getNumberOfRules(rr::Ptr{Nothing})
   result = ccall(dlsym(rrlib, :getConservedSums), cdecl, Cint, (Ptr{Nothing},), rr)
   if result == -1
@@ -1613,6 +1792,11 @@ function getNumberOfRules(rr::Ptr{Nothing})
 end
 
 ## could return null, error checking
+## Attention Return Null
+""""
+    getModelName(rr::Ptr{Nothing})
+Return the name of currently loaded SBML model.
+"""
 function getModelName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getModelName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
@@ -1620,12 +1804,23 @@ end
 ###############################################################################
 #                           Linear Algebra Functions                          #
 ###############################################################################
+
 ## RRDoubleMatrixHelper
+## Attention Return Null
+""""
+    getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
   return ccall(dlsym(rrlib, :getEigenvaluesMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{RRDoubleMatrix},), rr)
 end
 
 ## RRComplexVectorHelper
+## Attention Return Null
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
   return ccall(dlsym(rrlib, :getEigenvaluesVector), cdecl, Ptr{RRComplexVector}, (Ptr{RRDoubleMatrix},), rr)
 end
@@ -1633,6 +1828,11 @@ end
 ###############################################################################
 #                               Reset Methods                                 #
 ###############################################################################
+
+""""
+    resetRR(rr::Ptr{Nothing})
+Reset all variables of the model to their current initial values. Does not change the parameters.
+"""
 function resetRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :reset), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1640,6 +1840,10 @@ function resetRR(rr::Ptr{Nothing})
   end
 end
 
+""""
+    resetAllRR(rr::Ptr{Nothing})
+Reset all variables of the model to their current initial values, and resets all parameters to their original values.
+"""
 function resetAllRR(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :resetAll), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1647,6 +1851,10 @@ function resetAllRR(rr::Ptr{Nothing})
   end
 end
 
+""""
+    resetToOriginRR(rr::Ptr{Nothing})
+Reset the model to the state in which it was first loaded, including initial conditions, variables, and parameters.
+"""
 function resetToOriginRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :resetToOrigin), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1658,26 +1866,52 @@ end
 #                          Solver Options and APIs                            #
 ###############################################################################
 
+""""
+    getNumRegisteredIntegrators()
+Get the number of registered integrators.
+"""
 function getNumRegisteredIntegrators()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
+""""
+    getRegisteredIntegratorName(n::Int64)
+Get the name of a registered integrator (e.g. cvode etc.)
+"""
 function getRegisteredIntegratorName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorName), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getRegisteredIntegratorHint(n::Int64)
+Get the hint of a registered integrator (e.g. cvode etc.)
+"""
 function getRegisteredIntegratorHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorHint), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getRegisteredIntegratorDescription(n::Int64)
+Get the description of a registered integrator (e.g. cvode etc.).
+"""
 function getRegisteredIntegratorDescription(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorDescription), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getNumInstantiatedIntegrators(rr::Ptr{Nothing})
+Get the number of instantiated integrators. To instantiate an integrator, use setCurrentIntegrator.
+"""
 function getNumInstantiatedIntegrators(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumInstantiatedIntegrators), cdecl, Cint, (Ptr{Nothing},), rr)
 end
 
+## Attention Return False
+""""
+    setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
+Specify the current integrator to be used for simulation. This method instantiates a new integrator of the given type (e.g. cvode, gillespie) if one does not currently exist.
+Otherwise, the existing integrator of this type is used.
+"""
 function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
   result = ccall(dlsym(rrlib, :setCurrentIntegrator), cdecl, Cint, (Ptr{Nothing}, String), rr, nameOfIntegrator)
   if result == 0
@@ -1685,42 +1919,82 @@ function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
   end
 end
 
+""""
+    getCurrentIntegratorName(rr::Ptr{Nothing})
+Obtain a description of the current integrator.
+"""
 function getCurrentIntegratorName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    getCurrentIntegratorDescription(rr::Ptr{Nothing})
+Obtain a description of the current integrator.
+"""
 function getCurrentIntegratorDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    ggetCurrentIntegratorHint(rr::Ptr{Nothing})
+Obtain a short hint for the current integrator.
+"""
 function getCurrentIntegratorHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorHint), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
+Get the number of adjustable settings for the current integrator.
+"""
 function getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
+Get the name of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+Get the description for a specific integrator setting.
+"""
 function getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+Get the display name of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+Get the hint of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
+Get the type of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
+""""
+    resetCurrentIntegratorParameters(rr::Ptr{Nothing})
+Reset the integrator parameters to their default values.
+"""
 function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
   result = ccall(dlsym(rrlib, :resetCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing},), rr)
   if result == 0
@@ -1729,34 +2003,64 @@ function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
 end
 
 ## RRStringArrayHelper
+""""
+    getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
+Get the names of adjustable settings for the current integrator.
+"""
 function getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentIntegratorParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
+""""
+    getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+Get the names of adjustable settings for the current steady state solver.
+"""
 function getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
+Get the hint for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
-
+""""
+    getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
+Get the return type for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-
+""""
+    getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the integer value for a specific integrator setting
+"""
 function setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   return ccall(dlsym(rrlib, :setCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
 end
 
+""""
+    getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+Get the unsigned integer value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the unsigned integer value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
   if status == 0
@@ -1764,10 +2068,18 @@ function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::Stri
   end
 end
 
+""""
+    getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
+Set the double value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
   if status == 0
@@ -1775,10 +2087,18 @@ function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
+""""
+    getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
+Get the string value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
   status = ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
   if status == 0
@@ -1786,10 +2106,19 @@ function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
+""""
+    getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+Get the boolean value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+## Attention Return False
+""""
+    setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the boolean value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
   if status == 0
@@ -1797,22 +2126,44 @@ function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::S
   end
 end
 
+""""
+    getNumRegisteredSteadyStateSolvers()
+Get the number of registered steady state solvers.
+"""
 function getNumRegisteredSteadyStateSolvers()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
+""""
+    getRegisteredSteadyStateSolverName(n::Int64)
+Get the name of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverName), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+""""
+    getRegisteredSteadyStateSolverHint(n::Int64)
+Get the hint of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+""""
+    getRegisteredSteadyStateSolverDescription(n::Int64)
+Get the description of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverDescription(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+## Attention Return False
+""""
+    setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
+Specify the current steady state solver to be used for simulation.
+This method instantiates a new steady state solver of the given type (e.g. cvode, gillespie) if one does not currently exist. Otherwise, the existing steady state solver of this type is used.
+"""
 function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
   status = ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, nameOfSteadyStateSolver)
   if status == 0
@@ -1820,125 +2171,228 @@ function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::
   end
 end
 
+""""
+    getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
+Obtain a description of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
+Obtain a description of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
+Obtain a short hint for the current steady state solver.
+"""
 function getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+Get the number of adjustable settings for the current steady state solver.
+"""
 function getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
+Get the name of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+Get the display name of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+Get the description of a parameter of the current integrator.
+"""
 function getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
-
+""""
+    getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+Get the hint of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
+Get the type of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
+## Attention Return False
+""""
+    resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+Reset the steady state solver parameters to their default values.
+"""
 function resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
-  status = ccall(dlsym(rrlib, :resetCurrentSteadyStateSolverParameters), cdecl, Cint, (Ptr{Nothing},), rr)
-  if status == 0
+  status = ccall(dlsym(rrlib, :resetCurrentSteadyStateSolverParameters), cdecl, Bool, (Ptr{Nothing},), rr)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    solverTypeToString(code::Int64)
+Compute the eigenvalues of a double matrix.
+"""
 function solverTypeToString(code::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :solverTypeToString), cdecl, Ptr{UInt8}, (Cint, ), code))
 end
 
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Get a string description of the type [STATIC MEMORY - DO NOT FREE] Can call on return value of e.g. getCurrentSteadyStateSolverNthParameterType to retrieve human-readable string representation.
+"""
 function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
 ## RRString helper function
+""""
+    getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
+Get the names of adjustable settings for the current steady state solver.
+"""
 function getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentSteadyStateSolverParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+GGet the description for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
+Get the hint of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    etCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
+Get the type of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterInt), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+Get the unsigned integer value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the unsigned integer value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterUInt), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Set the double value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterDouble), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterDouble), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
+Set the string value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterString), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+Get the boolean value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-
+""""
+    setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the boolean value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterBoolean), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
@@ -1947,6 +2401,10 @@ end
 #                        Configuration Keys and Values                        #
 ###############################################################################
 
+""""
+    setConfigBool(key::String, value::Bool)
+    Set a boolean configuration value.
+"""
 function setConfigBool(key::String, value::Bool)
     status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
     println(status)
@@ -1960,10 +2418,18 @@ function setConfigBool(key::String, value::Bool)
     return status
 end
 
+""""
+    getConfigBool(key::String)
+Get a boolean configuration value.
+"""
 function getConfigBool(key::String)
   return ccall(dlsym(rrlib, :getConfigBool), cdecl, Bool, (Ptr{UInt8},), key)
 end
 
+""""
+    setConfigInt(key::String, value::Int64)
+Set an integer configuration value.
+"""
 function setConfigInt(key::String, value::Int64)
     status = ccall(dlsym(rrlib, :setConfigInt), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
     println(status)
@@ -1972,10 +2438,18 @@ function setConfigInt(key::String, value::Int64)
     end
 end
 
+""""
+    getConfigInt(key::String)
+Get an integer configuration value.
+"""
 function getConfigInt(key::String)
   return ccall(dlsym(rrlib, :getConfigInt), cdecl, Int64, (Ptr{UInt8},), key)
 end
 
+""""
+    setConfigDouble(key::String, value::Float64)
+Set a double configuration value.
+"""
 function setConfigDouble(key::String, value::Float64)
   status = ccall(dlsym(rrlib, :setConfigDouble), cdecl, Bool, (Ptr{UInt8}, Cdouble), key, value)
   if status == false
@@ -1983,10 +2457,18 @@ function setConfigDouble(key::String, value::Float64)
   end
 end
 
+""""
+    getConfigDouble(key::String)
+Get a double configuration value.
+"""
 function getConfigDouble(key::String)
   return ccall(dlsym(rrlib, :getConfigDouble), cdecl, Float64, (Ptr{UInt8},), key)
 end
 
+""""
+    getListOfConfigKeys()
+Get a list of all possible config keys.
+"""
 function getListOfConfigKeys()
   config_keys = String[]
   str_arr = ccall(dlsym(rrlib, :getListOfConfigKeys), cdecl, Ptr{RRStringArray}, ())
