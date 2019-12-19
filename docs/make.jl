@@ -13,5 +13,5 @@ makedocs(
 
 
 deploydocs(
-    repo = "github.com/Lukez-pi/RoadRunnerJulia.jl.git",
+    repo = "github.com/Lukez-pi/RoadRunner.jl.git",
 )
