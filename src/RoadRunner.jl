@@ -1,4 +1,4 @@
-module RoadRunnerJulia
+module RoadRunner
 __precompile__(false)
 
 export loada

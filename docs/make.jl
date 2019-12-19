@@ -1,17 +1,17 @@
-using Documenter, RoadRunnerJulia
+using Documenter, RoadRunner
 
 isCI = get(ENV, "CI", nothing) == "true"
 
 makedocs(
-    modules = [RoadRunnerJulia],
+    modules = [RoadRunner],
     pages = [
         "Home" => "index.md"
     ],
-    sitename = "RoadRunnerJulia",
+    sitename = "RoadRunner.jl",
     doctest = true
 )
 
 
 deploydocs(
-    repo = "github.com/Lukez-pi/RoadRunnerJulia.git",
+    repo = "github.com/Lukez-pi/RoadRunnerJulia.jl.git",
 )
