@@ -1866,26 +1866,52 @@ end
 #                          Solver Options and APIs                            #
 ###############################################################################
 
+""""
+    getNumRegisteredIntegrators()
+Get the number of registered integrators.
+"""
 function getNumRegisteredIntegrators()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
+""""
+    getRegisteredIntegratorName(n::Int64)
+Get the name of a registered integrator (e.g. cvode etc.)
+"""
 function getRegisteredIntegratorName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorName), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getRegisteredIntegratorHint(n::Int64)
+Get the hint of a registered integrator (e.g. cvode etc.)
+"""
 function getRegisteredIntegratorHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorHint), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getRegisteredIntegratorDescription(n::Int64)
+Get the description of a registered integrator (e.g. cvode etc.).
+"""
 function getRegisteredIntegratorDescription(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorDescription), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
+""""
+    getNumInstantiatedIntegrators(rr::Ptr{Nothing})
+Get the number of instantiated integrators. To instantiate an integrator, use setCurrentIntegrator.
+"""
 function getNumInstantiatedIntegrators(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumInstantiatedIntegrators), cdecl, Cint, (Ptr{Nothing},), rr)
 end
 
+## Attention Return False
+""""
+    setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
+Specify the current integrator to be used for simulation. This method instantiates a new integrator of the given type (e.g. cvode, gillespie) if one does not currently exist.
+Otherwise, the existing integrator of this type is used.
+"""
 function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
   result = ccall(dlsym(rrlib, :setCurrentIntegrator), cdecl, Cint, (Ptr{Nothing}, String), rr, nameOfIntegrator)
   if result == 0
@@ -1893,42 +1919,82 @@ function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
   end
 end
 
+""""
+    getCurrentIntegratorName(rr::Ptr{Nothing})
+Obtain a description of the current integrator.
+"""
 function getCurrentIntegratorName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    getCurrentIntegratorDescription(rr::Ptr{Nothing})
+Obtain a description of the current integrator.
+"""
 function getCurrentIntegratorDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    ggetCurrentIntegratorHint(rr::Ptr{Nothing})
+Obtain a short hint for the current integrator.
+"""
 function getCurrentIntegratorHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorHint), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
+""""
+    getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
+Get the number of adjustable settings for the current integrator.
+"""
 function getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
+Get the name of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+Get the description for a specific integrator setting.
+"""
 function getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+Get the display name of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+Get the hint of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
+Get the type of a parameter of the current integrator.
+"""
 function getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
+""""
+    resetCurrentIntegratorParameters(rr::Ptr{Nothing})
+Reset the integrator parameters to their default values.
+"""
 function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
   result = ccall(dlsym(rrlib, :resetCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing},), rr)
   if result == 0
@@ -1937,34 +2003,64 @@ function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
 end
 
 ## RRStringArrayHelper
+""""
+    getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
+Get the names of adjustable settings for the current integrator.
+"""
 function getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentIntegratorParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
+""""
+    getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+Get the names of adjustable settings for the current steady state solver.
+"""
 function getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
+Get the hint for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
-
+""""
+    getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
+Get the return type for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-
+""""
+    getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the integer value for a specific integrator setting
+"""
 function setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   return ccall(dlsym(rrlib, :setCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
 end
 
+""""
+    getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+Get the unsigned integer value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the unsigned integer value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
   if status == 0
@@ -1972,10 +2068,18 @@ function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::Stri
   end
 end
 
+""""
+    getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
+Set the double value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
   if status == 0
@@ -1983,10 +2087,18 @@ function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
+""""
+    getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
+Get the string value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Compute the eigenvalues of a double matrix.
+"""
 function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
   status = ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
   if status == 0
@@ -1994,10 +2106,19 @@ function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
+""""
+    getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+Get the boolean value for a specific integrator setting.
+"""
 function getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+## Attention Return False
+""""
+    setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the boolean value for a specific integrator setting.
+"""
 function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
   status = ccall(dlsym(rrlib, :setCurrentIntegratorParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
   if status == 0
@@ -2005,22 +2126,44 @@ function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::S
   end
 end
 
+""""
+    getNumRegisteredSteadyStateSolvers()
+Get the number of registered steady state solvers.
+"""
 function getNumRegisteredSteadyStateSolvers()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
+""""
+    getRegisteredSteadyStateSolverName(n::Int64)
+Get the name of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverName), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+""""
+    getRegisteredSteadyStateSolverHint(n::Int64)
+Get the hint of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+""""
+    getRegisteredSteadyStateSolverDescription(n::Int64)
+Get the description of a registered steady state solver (e.g. cvode etc.)
+"""
 function getRegisteredSteadyStateSolverDescription(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
+## Attention Return False
+""""
+    setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
+Specify the current steady state solver to be used for simulation.
+This method instantiates a new steady state solver of the given type (e.g. cvode, gillespie) if one does not currently exist. Otherwise, the existing steady state solver of this type is used.
+"""
 function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
   status = ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, nameOfSteadyStateSolver)
   if status == 0
@@ -2028,125 +2171,228 @@ function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::
   end
 end
 
+""""
+    getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
+Obtain a description of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
+Obtain a description of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
+Obtain a short hint for the current steady state solver.
+"""
 function getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
+""""
+    getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+Get the number of adjustable settings for the current steady state solver.
+"""
 function getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
+Get the name of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
+Get the display name of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
+Get the description of a parameter of the current integrator.
+"""
 function getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
-
+""""
+    getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
+Get the hint of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
+""""
+    getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
+Get the type of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
+## Attention Return False
+""""
+    resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
+Reset the steady state solver parameters to their default values.
+"""
 function resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
-  status = ccall(dlsym(rrlib, :resetCurrentSteadyStateSolverParameters), cdecl, Cint, (Ptr{Nothing},), rr)
-  if status == 0
+  status = ccall(dlsym(rrlib, :resetCurrentSteadyStateSolverParameters), cdecl, Bool, (Ptr{Nothing},), rr)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    solverTypeToString(code::Int64)
+Compute the eigenvalues of a double matrix.
+"""
 function solverTypeToString(code::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :solverTypeToString), cdecl, Ptr{UInt8}, (Cint, ), code))
 end
 
+""""
+    getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
+Get a string description of the type [STATIC MEMORY - DO NOT FREE] Can call on return value of e.g. getCurrentSteadyStateSolverNthParameterType to retrieve human-readable string representation.
+"""
 function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
 ## RRString helper function
+""""
+    getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
+Get the names of adjustable settings for the current steady state solver.
+"""
 function getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentSteadyStateSolverParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing}, ), rr)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
+GGet the description for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
+Get the hint of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
+""""
+    etCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
+Get the type of a parameter of the current steady state solver.
+"""
 function getCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
+Get the integer value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterInt), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
+Get the unsigned integer value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the unsigned integer value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterUInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterUInt), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
+Set the double value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterDouble), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterDouble), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
+Get the double value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
+""""
+    setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
+Set the string value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterString), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterString), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
 
+""""
+    getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
+Get the boolean value for a specific steady state solver setting.
+"""
 function getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-
+""""
+    setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
+Set the boolean value for a specific steady state solver setting.
+"""
 function setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
-  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
-  if status == 0
+  status = ccall(dlsym(rrlib, :setCurrentSteadyStateSolverParameterBoolean), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
+  if status == false
     error(getLastError())
   end
 end
