@@ -1,5 +1,9 @@
 include("rrc_types.jl")
 
+""""
+    getFileContent(fName::String)
+Retrieves the the content of a file.
+"""
 function getFileContent(fName::String)
   char_pointer = ccall(dlsym(rrlib, :getFileContent), cdecl, Ptr{UInt8}, (Ptr{UInt8},), fName)
   julia_str = unsafe_string(char_pointer)
@@ -7,6 +11,10 @@ function getFileContent(fName::String)
   return julia_str
 end
 
+""""
+    createText(text::String)
+Creates memory for holding a string.
+"""
 function createText(text::String)
   char_pointer = ccall(dlsym(rrlib, :createText), cdecl, Ptr{UInt8}, (Ptr{UInt8},), text)
   julia_str = unsafe_string(char_pointer)
@@ -14,6 +22,10 @@ function createText(text::String)
   return julia_str
 end
 
+""""
+    createTextMemory(count::Int64)
+Creates memory for holding a string.
+"""
 function createTextMemory(count::Int64)
   char_pointer = ccall(dlsym(rrlib, :createTextMemory), cdecl, Ptr{UInt8}, (Int64,), count)
   julia_str = unsafe_string(char_pointer)
