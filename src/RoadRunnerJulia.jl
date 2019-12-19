@@ -1418,7 +1418,6 @@ end
     getScaledElasticityMatrix(rr::Ptr{Nothing})
 Retrieve the scaled elasticity matrix for the current model.
 """
-
 function getScaledElasticityMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
@@ -1906,7 +1905,6 @@ function getNumInstantiatedIntegrators(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumInstantiatedIntegrators), cdecl, Cint, (Ptr{Nothing},), rr)
 end
 
-## Attention Return False
 """"
     setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
 Specify the current integrator to be used for simulation. This method instantiates a new integrator of the given type (e.g. cvode, gillespie) if one does not currently exist.

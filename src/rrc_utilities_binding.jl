@@ -1,5 +1,9 @@
 include("rrc_types.jl")
 
+""""
+    getFileContent(fName::String)
+Retrieves the the content of a file.
+"""
 function getFileContent(fName::String)
   char_pointer = ccall(dlsym(rrlib, :getFileContent), cdecl, Ptr{UInt8}, (Ptr{UInt8},), fName)
   julia_str = unsafe_string(char_pointer)
@@ -7,6 +11,10 @@ function getFileContent(fName::String)
   return julia_str
 end
 
+""""
+    createText(text::String)
+Creates memory for holding a string.
+"""
 function createText(text::String)
   char_pointer = ccall(dlsym(rrlib, :createText), cdecl, Ptr{UInt8}, (Ptr{UInt8},), text)
   julia_str = unsafe_string(char_pointer)
@@ -14,6 +22,10 @@ function createText(text::String)
   return julia_str
 end
 
+""""
+    createTextMemory(count::Int64)
+Creates memory for holding a string.
+"""
 function createTextMemory(count::Int64)
   char_pointer = ccall(dlsym(rrlib, :createTextMemory), cdecl, Ptr{UInt8}, (Int64,), count)
   julia_str = unsafe_string(char_pointer)
@@ -24,63 +36,141 @@ end
 ###############################################################################
 #                            List Handling Routines                           #
 ###############################################################################
-
+"""
+    createRRList()
+Create a new list. A list is a container for storing list items. List items can represent integers, double, strings and lists. To populate a list, create list items of the appropriate type and add them to the list
+Example, build the list [123, [3.1415926]]
+    1 l = createRRList(RRHandle handle);
+    2 item = createIntegerItem (123);
+    3 addItem (l, item);
+    4 item1 = createListItem(RRHandle handle);
+    5 item2 = createDoubleItem (3.1415926);
+    6 addItem (item1, item2);
+    7 addItem (l, item1);
+    8
+    9 item = getListItem (l, 0);
+   10 printf ("item = %d\n", item->data.iValue);
+   11
+   12 printf (listToString (l));
+   13 freeRRList (l);
+"""
 function createRRList()
   return ccall(dlsym(rrlib, :createRRList), cdecl, Ptr{RRList}, ())
 end
 
+"""
+    freeRRList(theList)
+Free RRListPtr structure, i.e destroy a list.
+"""
 function freeRRList(theList)
   ccall(dlsym(rrlib, :freeRRList), cdecl, Nothing, (Ptr{RRList},), theList)
 end
 
+"""
+    getListLength(myList)
+Returns the length of a given list.
+"""
 function getListLength(myList)
   return ccall(dlsym(rrlib, :getListLength), cdecl, Int64, (Ptr{RRList},), myList)
 end
 
+"""
+    createIntegerItem(value::Int64)
+Create a list item to store an integer.
+"""
 function createIntegerItem(value::Int64)
   return ccall(dlsym(rrlib, :createIntegerItem), cdecl, Ptr{RRListItem}, (Int64,), value)
 end
 
+"""
+    createDoubleItem(value::Float64)
+Create a list item to store a double value
+"""
 function createDoubleItem(value::Float64)
   return ccall(dlsym(rrlib, :createDoubleItem), cdecl, Ptr{RRListItem}, (Float64,), value)
 end
 
+"""
+    createStringItem(value::String)
+Create a list item to store a pointer to a string.
+"""
 function createStringItem(value::String)
   return ccall(dlsym(rrlib, :createStringItem), cdecl, Ptr{RRListItem}, (Ptr{UInt8},), value)
 end
 
+"""
+    createListItem(value::Ptr{RRList})
+Create a list item to store a list.
+"""
 function createListItem(value::Ptr{RRList})
   return ccall(dlsym(rrlib, :createListItem), cdecl, Ptr{RRListItem}, (Ptr{RRList},), value)
 end
 
+"""
+    addItem(list::Ptr{RRList}, item::Ptr{RRListItem})
+Create a list item to store a double value
+"""
 function addItem(list::Ptr{RRList}, item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :addItem), cdecl, Int64, (Ptr{RRList}, Ptr{RRListItem}), list, item)
 end
 
+"""
+    getListItem(list::Ptr{RRList}, index::Int64)
+Return the index^th item from the list.
+"""
 function getListItem(list::Ptr{RRList}, index::Int64)
   return ccall(dlsym(rrlib, :getListItem), cdecl, Ptr{RRListItem}, (Ptr{RRList}, Int64), list, index)
 end
 
+# Attention Return False
+"""
+    isListItemInteger(item::Ptr{RRListItem})
+Return true or false if the list item is an integer.
+"""
 function isListItemInteger(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemInteger ), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
+# Attention Return False
+"""
+    isListItemDouble(item::Ptr{RRListItem})
+Return true or false if the list item is a double.
+"""
 function isListItemDouble(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemDouble ), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
+## Attention Return False
+"""
+    isListItemString(item::Ptr{RRListItem})
+Return true or false if the list item is a character array.
+"""
 function isListItemString(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemString), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
+## Attention Return False
+"""
+    isListItemList(item::Ptr{RRListItem})
+Return true or false if the list item is a list itself.
+"""
 function isListItemList(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemList), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
+## Attention Return False
+"""
+    isListItem(item::Ptr{RRListItem}, itemType)
+Returns true or false if the list item is the given itemType.
+"""
 function isListItem(item::Ptr{RRListItem}, itemType)
   return ccall(dlsym(rrlib, :isListItem), cdecl, Bool, (Ptr{RRListItem}, Ptr{Nothing}), item, itemType)
 end
 
+"""
+    getIntegerListItem(item::Ptr{RRListItem})
+Return the integer from a list item.
+"""
 function getIntegerListItem(item::Ptr{RRListItem})
   value = Array{Int64}(undef,1)
   status = ccall(dlsym(rrlib, :getIntegerListItem), cdecl, Bool, (Ptr{RRListItem}, Ptr{Int64}), item, value)
@@ -90,6 +180,10 @@ function getIntegerListItem(item::Ptr{RRListItem})
   return value[1]
 end
 
+"""
+    getDoubleListItem(item::Ptr{RRListItem})
+Return the double from a list item.
+"""
 function getDoubleListItem(item::Ptr{RRListItem})
   value = Array{Float64}(undef,1)
   status = ccall(dlsym(rrlib, :getDoubleListItem ), cdecl, Bool, (Ptr{RRListItem}, Ptr{Float64}), item, value)
@@ -99,10 +193,20 @@ function getDoubleListItem(item::Ptr{RRListItem})
   return value[1]
 end
 
+## Attention Return Null
+"""
+    getStringListItem(item::Ptr{RRListItem})
+Return the string from a list item.
+"""
 function getStringListItem(item::Ptr{RRListItem})
   return bytestring(ccall(dlsym(rrlib, :getStringListItem), cdecl, Ptr{UInt8}, (Ptr{RRListItem},), item))
 end
 
+# Attention Return Null
+"""
+    getList(item::Ptr{RRListItem})
+Return a list from a list item if it contains a list.
+"""
 function getList(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :getList), cdecl, Ptr{RRList}, (Ptr{RRListItem},), item)
 end
@@ -110,6 +214,7 @@ end
 ###############################################################################
 #                              Helper Routines                                #
 ###############################################################################
+
 
 function getVectorLength(vector::Ptr{RRVector})
   return ccall(dlsym(rrlib, :getVectorLength), cdecl, Int64, (Ptr{RRVector},), vector)
