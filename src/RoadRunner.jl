@@ -9,17 +9,19 @@ export steadyState
 
 
 using Libdl
-push!(Libdl.DL_LOAD_PATH, "./")
-current_dir = @__DIR__
-rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
-antimony_api = joinpath(current_dir, "libantimony.dll")
+# push!(Libdl.DL_LOAD_PATH, "./")
+# current_dir = @__DIR__
+# rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
+# antimony_api = joinpath(current_dir, "libantimony.dll")
+#
+# rrlib = Libdl.dlopen(rr_api)
+# antlib = Libdl.dlopen(antimony_api)
+#
+# include("rrc_utilities_binding.jl")
+# include("rrc_types.jl")
+# include("antimony_binding.jl")
 
-rrlib = Libdl.dlopen(rr_api)
-antlib = Libdl.dlopen(antimony_api)
 
-include("rrc_utilities_binding.jl")
-include("rrc_types.jl")
-include("antimony_binding.jl")
 
 # function __init__()
 #   global rrlib = Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")

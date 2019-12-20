@@ -1,4 +1,4 @@
-# RoadRunnerJulia
+# RoadRunner
 
 [![Build Status](https://travis-ci.com/Lukez-pi/RoadRunner.jl.svg?branch=master)](https://travis-ci.com/Lukez-pi/RoadRunner.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/Lukez-pi/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/Lukez-pi/roadrunner-jl)
