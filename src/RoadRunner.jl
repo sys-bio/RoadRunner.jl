@@ -6,27 +6,29 @@ export createRRInstance
 export simulate
 export getFloatingSpeciesIds
 export steadyState
-
+export freeRRInstance
+export plotSimulation
 
 using Libdl
-# push!(Libdl.DL_LOAD_PATH, "./")
-# current_dir = @__DIR__
-# rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
-# antimony_api = joinpath(current_dir, "libantimony.dll")
-#
+using Plots
+current_dir = @__DIR__
+rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
+antimony_api = joinpath(current_dir, "libantimony.dll")
+rrlib = Ptr{Nothing}
+antlib = Ptr{Nothing}
+
 # rrlib = Libdl.dlopen(rr_api)
 # antlib = Libdl.dlopen(antimony_api)
-#
+
 include("rrc_utilities_binding.jl")
 include("rrc_types.jl")
 include("antimony_binding.jl")
 
-
-
-# function __init__()
-#   global rrlib = Libdl.dlopen("C:/vs_rebuild/install/roadrunner/bin/roadrunner_c_api.dll")
-#   global antlib = Libdl.dlopen("C:/Users/lukez/OneDrive/Desktop/Network Generator/Network-Generator/libantimony.dll")
-# end
+# cannot precompile function pointers to Clibraries
+function __init__()
+  global rrlib = Libdl.dlopen(rr_api)
+  global antlib = Libdl.dlopen(antimony_api)
+end
 
 """
     loada(antString::String)
@@ -47,6 +49,11 @@ function loada(antString::String)
   return rr
 end
 
+function plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
+  speciesName = getFloatingSpeciesIds(rr)
+  time = simData[:, 1]
+  plot(time, simData[:, 2:end], label = speciesName)
+end
 ###############################################################################
 #            Library Initialization and Termination Methods                   #
 ###############################################################################
@@ -702,8 +709,6 @@ end
 Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
 """
 function simulate(rr::Ptr{Nothing})
-  data = ccall(dlsym(rrlib, :simulate), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
-  print(data)
   return simulate_helper(data)
 end
 
@@ -718,11 +723,11 @@ end
 
 # calls simulateEx
 """
-    simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
+    simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, setNumPoints::Int)
 Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
 """
-function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, steps::Int)
-  data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, steps)
+function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, setNumPoints::Int64)
+  data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, setNumPoints)
   return simulate_helper(data)
 end
 
