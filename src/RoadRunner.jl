@@ -17,9 +17,9 @@ using Libdl
 # rrlib = Libdl.dlopen(rr_api)
 # antlib = Libdl.dlopen(antimony_api)
 #
-# include("rrc_utilities_binding.jl")
-# include("rrc_types.jl")
-# include("antimony_binding.jl")
+include("rrc_utilities_binding.jl")
+include("rrc_types.jl")
+include("antimony_binding.jl")
 
 
 
