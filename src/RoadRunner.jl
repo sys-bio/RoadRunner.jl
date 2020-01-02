@@ -2515,11 +2515,6 @@ function resultsColumn(resultHandle, column::Int64)
   return results
 end
 
-function getNumberOfFloatingSpecies(rr)
-     n = ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), stdcall, Int64, (UInt,), rr)
-     return n
-end
-
 function createRRCData(rrDataHandle)
     return ccall(dlsym(rrlib, :createRRCData), cdecl, UInt, (Ptr{Nothing},), rrDataHandle)
 end
