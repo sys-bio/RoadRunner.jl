@@ -2582,12 +2582,37 @@ function addReaction(rr::Ptr{Nothing}, rid::String, reactants::Array{String}, pr
   end
 end
 
+function removeReaction(rr::Ptr{Nothing}, rid::String, regen::Bool)
+  status = false
+  if regen == true
+    status = ccall(dlsym(rrlib, :removeReaction), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, rid)
+  else
+    status = ccall(dlsym(rrlib, :removeReactionNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, rid)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+
 function addParameter(rr::Ptr{Nothing}, pid::String, value::Float64, forceRegen::Bool)
   status = false
   if forceRegen == true
      status = ccall(dlsym(rrlib, :addParameter), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, pid, value)
   else
     status = ccall(dlsym(rrlib, :addParameterNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Cdouble), rr, pid, value)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+function removeParameter(rr::Ptr{Nothing}, pid::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :removeParameter), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, pid)
+  else
+    status = ccall(dlsym(rrlib, :removeParameterNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, pid)
   end
   if status == false
     error(getLastError())
