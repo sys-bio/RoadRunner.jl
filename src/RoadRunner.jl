@@ -49,6 +49,10 @@ function loada(antString::String)
   return rr
 end
 
+#this function is not availabl in C API
+"""
+    plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
+"""
 function plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
   speciesName = getFloatingSpeciesIds(rr)
   time = simData[:, 1]
@@ -61,6 +65,7 @@ end
     createRRInstance()
 Initialize  and return a new roadRunner instances.
 """
+#self same: createRRInstance
 function createRRInstance()
   val = ccall(dlsym(rrlib, :createRRInstance), cdecl, Ptr{Nothing}, ())
   if val == C_NULL
@@ -82,6 +87,7 @@ end
     freeRRInstance(rr::Ptr{Nothing})
 Free the roadRunner instance.
 """
+#self the same: freeRRInstance
 function freeRRInstance(rr::Ptr{Nothing})
   free_status = ccall(dlsym(rrlib, :freeRRInstance), cdecl, Bool, (Ptr{Nothing},), rr)
   if free_status == false
@@ -128,6 +134,7 @@ end
     loadSBML(rr::Ptr{Nothing}, sbml::String)
 Load a model from an SBML string.
 """
+#self not same: loadSBML
 function loadSBML(rr::Ptr{Nothing}, sbml::String)
   status = ccall(dlsym(rrlib, :loadSBML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, sbml)
   if status == false
@@ -135,6 +142,9 @@ function loadSBML(rr::Ptr{Nothing}, sbml::String)
   end
 end
 
+#function loadSBML(rr::Ptr{Nothing}, sbml::String)
+#  return ccall(dlsym(rrlib, :loadSBML), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, sbml)
+#end
 """
     loadSBMLEx(rr::Ptr{Nothing}, sbml::String, forceRecompile::Bool)
 Load a model from an SBML string.
@@ -202,17 +212,33 @@ end
     getCurrentSBM(handle::Ptr{Nothing})
 Retrieve the current state of the model in the form of an SBML string.
 """
+#self not same: getCurrentSBML
 function getCurrentSBML(handle::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), handle))
 end
+
+#function getCurrentSBML(rr)
+#  char_pointer=ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr)
+#  julia_str=unsafe_string(char_pointer)
+#  freeText(char_pointer)
+#  return julia_str
+#end
 
 """
     getSBM(rr::Ptr{Nothing})
 Retrieve the SBML model that was last loaded into roadRunner.
 """
+#self not same: getSBML
 function getSBML(rr::Ptr{Nothing})
    return unsafe_string(ccall(dlsym(rrlib, :getSBML), Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
+
+#function getSBML(rr)
+#  char_pointer=ccall(dlsym(rrlib, :getSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr)
+#  julia_str=unsafe_string(char_pointer)
+#  freeText(char_pointer)
+#  return julia_str
+#end
 
 ###############################################################################
 #                          Utilities Functions                               #
@@ -453,6 +479,7 @@ end
     getLastError()
 Retrieve the current error string. Example, str = getLastError (void);
 """
+#self same: getLastError
 function getLastError()
   return unsafe_string(ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ()))
 end
@@ -482,6 +509,10 @@ function disableLoggingToConsole()
     error(getLastError())
   end
 end
+#self
+#function disableLoggingToConsole()
+#    ccall(dlsym(rrlib, :disableLoggingToConsole), cdecl, Bool, ())
+#end
 
 """
     enableLoggingToFile()
@@ -653,6 +684,7 @@ end
     setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
 Set the time start for a time course simulation.
 """
+#self the same: setTimeStart
 function setTimeStart(rr::Ptr{Nothing}, timeStart::Number)
    status = ccall(dlsym(rrlib, :setTimeStart), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeStart)
    if status == false
@@ -664,6 +696,7 @@ end
     setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
 Set the time end for a time course simulation.
 """
+#self the same: setTimeEnd
 function setTimeEnd(rr::Ptr{Nothing}, timeEnd::Number)
   status = ccall(dlsym(rrlib, :setTimeEnd), cdecl, Bool, (Ptr{Nothing}, Float64), rr, timeEnd)
   if status == false
@@ -675,6 +708,7 @@ end
     setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
 Set the number of points to generate in a time course simulation.
 """
+#self the same: setNumPoints
 function setNumPoints(rr::Ptr{Nothing}, nrPoints::Int64)
   status = ccall(dlsym(rrlib, :setNumPoints), cdecl, Bool, (Ptr{Nothing}, Int64), rr, nrPoints)
   if status == false
@@ -688,6 +722,7 @@ Set the selection list for output from simulate(void) or simulateEx(void). Use g
 Example: setTimeCourseSelectionList ("Time, S1, J1, J2");
 or setTimeCourseSelectionList ("Time S1 J1 J2")
 """
+#self the same: setTimeCourseSelectionList
 function setTimeCourseSelectionList(rr::Ptr{Nothing}, list::String)
   status = ccall(dlsym(rrlib, :setTimeCourseSelectionList), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, list)
   if status == false
@@ -722,6 +757,7 @@ function getSimulationResult(rr::Ptr{Nothing})
 end
 
 # calls simulateEx
+# self not same: simulate
 """
     simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, setNumPoints::Int)
 Carry out a time-course simulation. setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
@@ -731,6 +767,7 @@ function simulate(rr::Ptr{Nothing}, startTime::Number, endTime::Number, setNumPo
   return simulate_helper(data)
 end
 
+#this function is not origianlly from C API
 function simulate_helper(data::Ptr{RRCData})
   num_row = getRRDataNumRows(data)
   num_col = getRRDataNumCols(data)
@@ -748,6 +785,14 @@ function simulate_helper(data::Ptr{RRCData})
   end
   return data_arr
 end
+
+#function simulate(rr::Ptr{Nothing})
+#  return ccall(dlsym(rrlib, :simulate), cdecl, Ptr{RRCData}, (Ptr{Nothing},), rr)
+#end
+
+#function simulateEX(rr::Ptr{Nothing}, startTime::Number, endTime::Number, setNumPoints::Int64)
+#  data = ccall(dlsym(rrlib, :simulateEx), cdecl, Ptr{RRCData}, (Ptr{Nothing}, Cdouble, Cdouble, Cint), rr, startTime, endTime, setNumPoints)
+#end
 
 """
     oneStep(rr::Ptr{Nothing}, currentTime::Float64, stepSize::Float64)
@@ -814,6 +859,7 @@ end
 Compute the steady state of the current model.
 Example: status = steadyState (rrHandle, &closenessToSteadyState);
 """
+#self checked: steadyState
 function steadyState(rr::Ptr{Nothing})
   value = Array{Float64}(undef, 1)
   status = ccall(dlsym(rrlib, :steadyState), cdecl, Bool, (Ptr{Nothing}, Ptr{Float64}), rr, value)
@@ -869,6 +915,7 @@ end
     getNumberOfReactions(rr::Ptr{Nothing})
 Obtain the number of reactions in the loaded model. Example: number = getNumberOfReactions (RRHandle handle);
 """
+#self same: getNumberOfReactions
 function getNumberOfReactions(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfReactions), cdecl, Int64, (Ptr{Nothing},), rr)
 end
@@ -913,6 +960,7 @@ end
     getReactionIds(rr::Ptr{Nothing})
 Obtain the list of reaction Ids.
 """
+#self not same: getReactionIds
 function getReactionIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getReactionIds), cdecl, Ptr{Nothing}, (Ptr{Nothing},), rr)
   num_rxns = getNumberOfReactions(rr)
@@ -928,6 +976,10 @@ function getReactionIds(rr::Ptr{Nothing})
   end
   return rxnIds
 end
+
+#function getReactionIds(rr)
+#  return ccall(dlsym(rrlib, :getReactionIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+#end
 
 ###############################################################################
 #                            Rates of Change Group                            #
@@ -960,9 +1012,10 @@ end
 Retrieve the rate of change for a given floating species.
 Example: status = getRateOfChange (&index, *value);
 """
+#self checked: getRateOfChange
 function getRateOfChange(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
-  status = ccall(dlsym(rrlib :getRateOfChange), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, inde, value)
+  status = ccall(dlsym(rrlib :getRateOfChange), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
   if status == false
     error(getLastError())
   end
@@ -986,18 +1039,20 @@ end
 
 ## RRVectorHelper
 ## Attention Returns False
-""""
+"""
     getBoundarySpeciesConcentrations(rr::Ptr{Nothing})
 Retrieve the concentration for a particular floating species.
 """
+#self the same: getBoundarySpeciesConcentrations
 function getBoundarySpeciesConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getBoundarySpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the concentration for a particular boundary species.
 """
+#self the same: setBoundarySpceisByIndex
 function setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setBoundarySpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -1005,7 +1060,7 @@ function setBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
   end
 end
 
-""""
+"""
     getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the concentration for a particular floating species.
 """
@@ -1019,7 +1074,7 @@ function getBoundarySpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
 end
 
 ## RRVectorHelper
-""""
+"""
     setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
 Set the boundary species concentration to the vector vec.
 Example:
@@ -1036,16 +1091,18 @@ function setBoundarySpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   end
 end
 
-""""
+"""
     getNumberOfBoundarySpecies(rr::Ptr{Nothing})
 Return the number of boundary species in the model.
 """
+#self the same: getNumberOfBoundarySpecies
 function getNumberOfBoundarySpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfBoundarySpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
 ## Attention Returns Null
-""""
+#self not same: getboundaryspeciesids
+"""
     getBoundarySpeciesIds(rr::Ptr{Nothing})
 Obtain the list of boundary species Ids.
 """
@@ -1065,22 +1122,27 @@ function getBoundarySpeciesIds(rr::Ptr{Nothing})
   return b_species
 end
 
+#function getBoundarySpeciesIds(rr)
+#  return ccall(dlsym(rrlib, :getBoundarySpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+#end
+
 ###############################################################################
 #                           Floating Species Group                            #
 ###############################################################################
 
 ## RRVectorHelper
 
-""""
+"""
     getFloatingSpeciesConcentrations(rr::Ptr{Nothing})
 Retrieve in a vector the concentrations for all the floating species.
 Example:  RVectorPtr values = getFloatingSpeciesConcentrations (void);
 """
+#self checked: getFloatingSpeciesConcentrations
 function getFloatingSpeciesConcentrations(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getFloatingSpeciesConcentrations), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the initial concentration for a particular floating species.
 """
@@ -1092,7 +1154,7 @@ function setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::
 end
 
 ## Attention Returns False
-""""
+"""
     getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64)
 Get the initial concentration for a particular floating species.
 """
@@ -1105,10 +1167,11 @@ function getFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::
   return value[1]
 end
 
-""""
+"""
     setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the concentration for a particular floating species.
 """
+#self same: setFloatingSpeciesByIndex
 function setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setFloatingSpeciesByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -1117,7 +1180,7 @@ function setFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
 end
 
 ## Attention Returns False
-""""
+"""
     getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the concentration for a particular floating species.
 """
@@ -1130,7 +1193,7 @@ function getFloatingSpeciesByIndex(rr::Ptr{Nothing}, index::Int64)
   return value[1]
 end
 
-""""
+"""
     setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
 Set the floating species concentration to the vector vec.
 Example:
@@ -1147,15 +1210,16 @@ function setFloatingSpeciesConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
   end
 end
 
-""""
+"""
     getNumberOfFloatingSpecies(rr::Ptr{Nothing})
 Return the number of floating species in the model.
 """
+#self same: getNumberOfFloatingSpecies
 function getNumberOfFloatingSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfFloatingSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getNumberOfDependentSpecies(rr::Ptr{Nothing})
 Return the number of dependent species in the mode.
 """
@@ -1163,7 +1227,7 @@ function getNumberOfDependentSpecies(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfDependentSpecies), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getNumberOfIndependentSpecies(rr::Ptr{Nothing})
 Return the number of independent species in the model.
 """
@@ -1172,10 +1236,11 @@ function getNumberOfIndependentSpecies(rr::Ptr{Nothing})
 end
 
 ## Attention Returns Null
-""""
+"""
     getFloatingSpeciesIds(rr::Ptr{Nothing})
 Obtain the list of floating species Id.
 """
+#self not same: getFloatingSpeciesIds
 function getFloatingSpeciesIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getFloatingSpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   species = String[]
@@ -1191,12 +1256,16 @@ function getFloatingSpeciesIds(rr::Ptr{Nothing})
   end
   return species
 end
+#
+#function getFloatingSpeciesIds(rr)
+#  return ccall(dlsym(rrlib, :getFloatingSpeciesIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+#end
 
 ###############################################################################
 #                           Intial Conditions Group                           #
 ###############################################################################
 
-""""
+"""
     setFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing}, vec::Ptr{RRVector})
 Set the initial floating species concentrations.
 Example: status = setFloatingSpeciesInitialConcentrations (vec);
@@ -1210,7 +1279,7 @@ end
 
 ## RRVectorHelper
 ## Attention Returns Null
-""""
+"""
     getFloatingSpeciesInitialConcentrations(rr::Ptr{Nothing})
 Get the initial floating species concentrations.
 Example: vec = getFloatingSpeciesInitialConcentrations (RRHandle handle);
@@ -1221,7 +1290,7 @@ end
 
 ## RRStringArrayHelper
 ## Attention Returns Null
-""""
+"""
     getFloatingSpeciesInitialConditionIds(rr::Ptr{Nothing})
 Get the initial floating species Ids.
 Example: vec = getFloatingSpeciesInitialConditionIds (RRHandle handle);
@@ -1237,7 +1306,7 @@ end
 
 ## RRVectorHelper
 ## Attention Returns False
-""""
+"""
     getGlobalParameterValues(rr::Ptr{Nothing})
 Retrieve the global parameter value.
 Example: RRVectorPtr values = getGlobalParameterValues (void);
@@ -1246,10 +1315,11 @@ function getGlobalParameterValues(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getGlobalParameterValues), cdecl, Ptr{RRVector}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the value for a particular global parameter.
 """
+#self checked: setGlobalParameterByIndex
 function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   status = ccall(dlsym(rrlib, :setGlobalParameterByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
@@ -1257,7 +1327,7 @@ function setGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64, value::Float6
   end
 end
 
-""""
+"""
     getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the global parameter value.
 """
@@ -1270,19 +1340,21 @@ function getGlobalParameterByIndex(rr::Ptr{Nothing}, index::Int64)
   return value[1]
 end
 
-""""
+"""
     getNumberOfGlobalParameters(rr::Ptr{Nothing})
 Return the number of global parameters in the model.
 """
+#self same: getNumberOfGlobalParameters
 function getNumberOfGlobalParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfGlobalParameters), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
 ## Attention Returns Null
-""""
+"""
     getGlobalParameterIds(rr::Ptr{Nothing})
 Obtain the list of global parameter Ids.
 """
+# self not same: getGlobalParameterIds
 function getGlobalParameterIds(rr::Ptr{Nothing})
   data = ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
   global_params = String[]
@@ -1299,10 +1371,14 @@ function getGlobalParameterIds(rr::Ptr{Nothing})
   return global_params
 end
 
+#function getGlobalParameterIds(rr)
+#  return ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+#end
+
 ###############################################################################
 #                              Compartment Group                              #
 ###############################################################################
-""""
+"""
     getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
 Retrieve the compartment volume for a particular compartment.
 """
@@ -1315,7 +1391,7 @@ function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   return value[1]
 end
 
-""""
+"""
     setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
 Set the volume for a particular compartment.
 """
@@ -1326,7 +1402,7 @@ function setCompartmentByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
   end
 end
 
-""""
+"""
     getNumberOfCompartments(rr::Ptr{Nothing})
 Return the number of compartments in the model.
 """
@@ -1334,7 +1410,7 @@ function getNumberOfCompartments(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCompartments), cdecl, Int64, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getCompartmentIds(rr::Ptr{Nothing})
 Obtain the list of compartment Ids.
 Example: str = getCompartmentIds (RRHandle handle);
@@ -1361,7 +1437,7 @@ end
 
 ## RRListHelper
 ## Attention Return Null
-""""
+"""
     getElasticityCoefficientIds(rr::Ptr{Nothing})
 Obtain the list of elasticity coefficient Ids.
 """
@@ -1371,7 +1447,7 @@ end
 
 ## RRListHelper
 ## Attention Returns Null
-""""
+"""
     getUnscaledFluxControlCoefficientIds(rr::Ptr{Nothing})
 Obtain the list of unscaled flux control coefficient Ids.
 """
@@ -1381,7 +1457,7 @@ end
 
 ## RRListHelper
 ## Attention Returns Null
-""""
+"""
     getFluxControlCoefficientIds(rr::Ptr{Nothing})
 Obtain the list of flux control coefficient Ids.
 """
@@ -1391,7 +1467,7 @@ end
 
 ## RRListHelper
 ## Attention Returns Null
-""""
+"""
     getUnscaledConcentrationControlCoefficientIds(rr::Ptr{Nothing})
 Obtain the list of unscaled concentration control coefficient Ids.
 """
@@ -1401,7 +1477,7 @@ end
 
 ## RRListHelper
 # Attention Returns Null
-""""
+"""
     getConcentrationControlCoefficientIds(rr::Ptr{Nothing})
 Obtain the list of concentration coefficient Ids.
 """
@@ -1411,7 +1487,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Returns Null
-""""
+"""
     getUnscaledElasticityMatrix(rr::Ptr{Nothing})
 Retrieve the unscaled elasticity matrix for the current model.
 """
@@ -1421,7 +1497,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Returns Null
-""""
+"""
     getScaledElasticityMatrix(rr::Ptr{Nothing})
 Retrieve the scaled elasticity matrix for the current model.
 """
@@ -1429,7 +1505,7 @@ function getScaledElasticityMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledElasticityMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getScaledFloatingSpeciesElasticity(rr::Ptr{Nothing}, reactionId::String, speciesId::String)
 Retrieve the scaled elasticity matrix for the current model.
 """
@@ -1444,7 +1520,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Returns Null
-""""
+"""
     getUnscaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
 Retrieve the matrix of unscaled concentration control coefficients for the current model.
 """
@@ -1454,17 +1530,18 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Returns Null
-""""
+"""
     getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
 Retrieve the matrix of scaled concentration control coefficients for the current model.
 """
+# self checked: getScaledConcentrationControlCoefficientMatrix
 function getScaledConcentrationControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledConcentrationControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getUnscaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
 Retrieve the matrix of unscaled flux control coefficients for the current model.
 """
@@ -1474,7 +1551,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
 Retrieve the matrix of scaled flux control coefficients for the current model.
 """
@@ -1482,7 +1559,7 @@ function getScaledFluxControlCoefficientMatrix(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getScaledFluxControlCoefficientMatrix), cdecl, Ptr{RRDoubleMatrix}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
 Retrieve a single unscaled control coefficient.
 """
@@ -1495,7 +1572,7 @@ function getuCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   return value[1]
 end
 
-""""
+"""
     getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
 Retrieve a single control coefficient.
 """
@@ -1507,7 +1584,7 @@ function getCC(rr::Ptr{Nothing}, variable::String, parameter::String)
   end
   return value[1]
 end
-""""
+"""
     getEE(rr::Ptr{Nothing}, name::String, species::String)
 Retrieve a single elasticity coefficient.
 """
@@ -1519,7 +1596,7 @@ function getEE(rr::Ptr{Nothing}, name::String, species::String)
   end
   return value[1]
 end
-""""
+"""
     getuEE(rr::Ptr{Nothing}, name::String, species::String)
 Retrieve a single unscaled elasticity coefficient.
 """
@@ -1537,7 +1614,7 @@ end
 ###############################################################################
 
 
-""""
+"""
     getSeed(rr::Ptr{Nothing})
 Determine the current seed used by the random generator.
 """
@@ -1550,7 +1627,7 @@ function getSeed(rr::Ptr{Nothing})
   return value[1]
 end
 
-""""
+"""
     setSeed(rr::Ptr{Nothing}, result::Float32)
 Determine the current seed used by the random generator.
 """
@@ -1562,7 +1639,7 @@ function setSeed(rr::Ptr{Nothing}, result::Float32)
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespie(rr::Ptr{Nothing})
 Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
 """
@@ -1571,7 +1648,7 @@ function gillespie(rr::Ptr{Nothing})
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
 Carry out a time-course simulation using the Gillespie algorithm with variable step size. setTimeStart, setTimeEnd, etc are used to set the simulation characteristics.
 """
@@ -1580,7 +1657,7 @@ function gillespieEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64)
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieOnGrid(rr::Ptr{Nothing})
 Carry out a time-course simulation using the Gillespie algorithm based on the given arguments, time start, time end and number of points.
 Example:
@@ -1594,7 +1671,7 @@ function gillespieOnGrid(rr::Ptr{Nothing})
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64)
 Carry out a time-course simulation using the Gillespie algorithm with fixed step size based on the given arguments, time start, time end, and number of points.
 Example:
@@ -1609,7 +1686,7 @@ function gillespieOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float6
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
 Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
 setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
@@ -1619,7 +1696,7 @@ function gillespieMeanOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
 Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average of the simulations.
 Based on the given arguments, time start, time end, and number of points.
@@ -1636,7 +1713,7 @@ function gillespieMeanOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Fl
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
 Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
 setTimeStart, setTimeEnd, setNumPoints, etc are used to set the simulation characteristics.
@@ -1646,7 +1723,7 @@ function gillespieMeanSDOnGrid(rr::Ptr{Nothing}, numberOfSimulations::Int64)
 end
 
 ## RRCDataHelper
-""""
+"""
     gillespieMeanSDOnGridEx(rr::Ptr{Nothing}, timeStart::Float64, timeEnd::Float64, numberOfPoints::Int64, numberOfSimulations::Int64)
 Carry out a series of time-course simulations using the Gillespie algorithm with fixed step size, then return the average and standard deviation of the simulations.
 Based on the given arguments, time start, time end, number of points, and number of simulations.
@@ -1668,7 +1745,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getFullJacobian(rr::Ptr{Nothing})
 Retrieve the full Jacobian for the current model.
 """
@@ -1678,7 +1755,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getReducedJacobian(rr::Ptr{Nothing})
 Retrieve the reduced Jacobian for the current model. setComputeAndAssignConservationLaws (true) must be enabled
 """
@@ -1688,7 +1765,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getEigenvalues(rr::Ptr{Nothing})
 Retrieve the eigenvalue matrix for the current model.
 """
@@ -1698,7 +1775,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getStoichiometryMatrix(rr::Ptr{Nothing})
 Retrieve the stoichiometry matrix for the current model.
 """
@@ -1708,7 +1785,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getLinkMatrix(rr::Ptr{Nothing})
 Retrieve the Link matrix for the current model.
 """
@@ -1718,7 +1795,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getNrMatrix(rr::Ptr{Nothing})
 Retrieve the reduced stoichiometry matrix for the current model.
 """
@@ -1728,7 +1805,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getConservationMatrix(rr::Ptr{Nothing})
 Retrieve the conservation matrix for the current model.
 The conservation laws as describe by row where the columns indicate the species Id.
@@ -1739,7 +1816,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getL0Matrix(rr::Ptr{Nothing})
 Return the L0 Matrix. L0 is defined such that L0 Nr = N0. L0 forms part of the link matrix, L.
 N0 is the set of linear dependent rows from the lower portion of the reordered stoichiometry matrix.
@@ -1750,7 +1827,7 @@ end
 
 ## RRComplexMatrixHelper
 ## Attention Return Null
-""""
+"""
     getEigenVectors(matrix::Ptr{RRComplexMatrix})
 Calculate the eigen-vectors of a square real matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
 The complex matrix returned contains the eigenvectors in the columns, in the same order as LibLA_getEigenValues.
@@ -1762,7 +1839,7 @@ end
 
 ## RRComplexMatrixHelper
 ## Attention Return Null
-""""
+"""
     getZEigenVectors(matrix::Ptr{RRComplexMatrix})
 Calculate the eigen-vectors of a square nonsymmetrix complex matrix. This function calculates the complex (right)eigenvectors of the given real matrix.
 The complex matrix returned contains the eigenvectors in the columns, in the same order as getZEigenValues. The right eigenvector v(j) of A satisfies:
@@ -1774,7 +1851,7 @@ end
 
 ## RRVector
 ## Attention Return Null
-""""
+"""
     getConservedSums(rr::Ptr{Nothing})
 Return values for conservation laws using the current initial conditions.
 """
@@ -1786,7 +1863,7 @@ end
 #                      Network Object Model Functions                         #
 ###############################################################################
 
-""""
+"""
     getNumberOfRules(rr::Ptr{Nothing})
 Return the number of rules in the current model.
 """
@@ -1799,7 +1876,7 @@ end
 
 ## could return null, error checking
 ## Attention Return Null
-""""
+"""
     getModelName(rr::Ptr{Nothing})
 Return the name of currently loaded SBML model.
 """
@@ -1813,7 +1890,7 @@ end
 
 ## RRDoubleMatrixHelper
 ## Attention Return Null
-""""
+"""
     getEigenvaluesMatrix(mat::Ptr{RRDoubleMatrix})
 Compute the eigenvalues of a double matrix.
 """
@@ -1823,7 +1900,7 @@ end
 
 ## RRComplexVectorHelper
 ## Attention Return Null
-""""
+"""
     getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
 Compute the eigenvalues of a double matrix.
 """
@@ -1835,10 +1912,11 @@ end
 #                               Reset Methods                                 #
 ###############################################################################
 
-""""
+"""
     resetRR(rr::Ptr{Nothing})
 Reset all variables of the model to their current initial values. Does not change the parameters.
 """
+#self the same: resetRR
 function resetRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :reset), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1846,10 +1924,11 @@ function resetRR(rr::Ptr{Nothing})
   end
 end
 
-""""
+"""
     resetAllRR(rr::Ptr{Nothing})
 Reset all variables of the model to their current initial values, and resets all parameters to their original values.
 """
+#self the same: resetAllRR
 function resetAllRR(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :resetAll), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
@@ -1857,7 +1936,7 @@ function resetAllRR(rr::Ptr{Nothing})
   end
 end
 
-""""
+"""
     resetToOriginRR(rr::Ptr{Nothing})
 Reset the model to the state in which it was first loaded, including initial conditions, variables, and parameters.
 """
@@ -1872,7 +1951,7 @@ end
 #                          Solver Options and APIs                            #
 ###############################################################################
 
-""""
+"""
     getNumRegisteredIntegrators()
 Get the number of registered integrators.
 """
@@ -1880,7 +1959,7 @@ function getNumRegisteredIntegrators()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
-""""
+"""
     getRegisteredIntegratorName(n::Int64)
 Get the name of a registered integrator (e.g. cvode etc.)
 """
@@ -1888,7 +1967,7 @@ function getRegisteredIntegratorName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorName), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
-""""
+"""
     getRegisteredIntegratorHint(n::Int64)
 Get the hint of a registered integrator (e.g. cvode etc.)
 """
@@ -1896,7 +1975,7 @@ function getRegisteredIntegratorHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorHint), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
-""""
+"""
     getRegisteredIntegratorDescription(n::Int64)
 Get the description of a registered integrator (e.g. cvode etc.).
 """
@@ -1904,7 +1983,7 @@ function getRegisteredIntegratorDescription(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredIntegratorDescription), cdecl, Ptr{UInt8}, (Cint,), n))
 end
 
-""""
+"""
     getNumInstantiatedIntegrators(rr::Ptr{Nothing})
 Get the number of instantiated integrators. To instantiate an integrator, use setCurrentIntegrator.
 """
@@ -1912,7 +1991,7 @@ function getNumInstantiatedIntegrators(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumInstantiatedIntegrators), cdecl, Cint, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
 Specify the current integrator to be used for simulation. This method instantiates a new integrator of the given type (e.g. cvode, gillespie) if one does not currently exist.
 Otherwise, the existing integrator of this type is used.
@@ -1924,7 +2003,7 @@ function setCurrentIntegrator(rr::Ptr{Nothing}, nameOfIntegrator::String)
   end
 end
 
-""""
+"""
     getCurrentIntegratorName(rr::Ptr{Nothing})
 Obtain a description of the current integrator.
 """
@@ -1932,7 +2011,7 @@ function getCurrentIntegratorName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorName), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
-""""
+"""
     getCurrentIntegratorDescription(rr::Ptr{Nothing})
 Obtain a description of the current integrator.
 """
@@ -1940,7 +2019,7 @@ function getCurrentIntegratorDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
-""""
+"""
     ggetCurrentIntegratorHint(rr::Ptr{Nothing})
 Obtain a short hint for the current integrator.
 """
@@ -1948,7 +2027,7 @@ function getCurrentIntegratorHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorHint), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr))
 end
 
-""""
+"""
     getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
 Get the number of adjustable settings for the current integrator.
 """
@@ -1956,7 +2035,7 @@ function getNumberOfCurrentIntegratorParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getNumberOfCurrentIntegratorParameters), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
-""""
+"""
     getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
 Get the name of a parameter of the current integrator.
 """
@@ -1964,7 +2043,7 @@ function getCurrentIntegratorNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
 Get the description for a specific integrator setting.
 """
@@ -1972,7 +2051,7 @@ function getCurrentIntegratorNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
 Get the display name of a parameter of the current integrator.
 """
@@ -1980,7 +2059,7 @@ function getCurrentIntegratorNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
 Get the hint of a parameter of the current integrator.
 """
@@ -1988,7 +2067,7 @@ function getCurrentIntegratorNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
 Get the type of a parameter of the current integrator.
 """
@@ -1996,7 +2075,7 @@ function getCurrentIntegratorNthParameterType(rr::Ptr{Nothing}, n::Int64)
   return ccall(dlsym(rrlib, :getCurrentIntegratorNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
 end
 
-""""
+"""
     resetCurrentIntegratorParameters(rr::Ptr{Nothing})
 Reset the integrator parameters to their default values.
 """
@@ -2008,7 +2087,7 @@ function resetCurrentIntegratorParameters(rr::Ptr{Nothing})
 end
 
 ## RRStringArrayHelper
-""""
+"""
     getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
 Get the names of adjustable settings for the current integrator.
 """
@@ -2016,7 +2095,7 @@ function getListOfCurrentIntegratorParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentIntegratorParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
 end
 
-""""
+"""
     getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterName::String)
 Get the names of adjustable settings for the current steady state solver.
 """
@@ -2024,21 +2103,21 @@ function getCurrentIntegratorParameterDescription(rr::Ptr{Nothing}, parameterNam
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
-""""
+"""
     getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
 Get the hint for a specific integrator setting.
 """
 function getCurrentIntegratorParameterHint(rr::Ptr{Nothing}, parameterName::String)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
-""""
+"""
     getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
 Get the return type for a specific integrator setting.
 """
 function getCurrentIntegratorParameterType(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-""""
+"""
     getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String)
 Get the integer value for a specific integrator setting.
 """
@@ -2046,7 +2125,7 @@ function getCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::Strin
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
 Set the integer value for a specific integrator setting
 """
@@ -2054,7 +2133,7 @@ function setCurrentIntegratorParameterInt(rr::Ptr{Nothing}, parameterName::Strin
   return ccall(dlsym(rrlib, :setCurrentIntegratorParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}, Cint), rr, parameterName, value)
 end
 
-""""
+"""
     getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String)
 Get the unsigned integer value for a specific integrator setting.
 """
@@ -2062,7 +2141,7 @@ function getCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::Stri
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
 Set the unsigned integer value for a specific integrator setting.
 """
@@ -2073,7 +2152,7 @@ function setCurrentIntegratorParameterUInt(rr::Ptr{Nothing}, parameterName::Stri
   end
 end
 
-""""
+"""
     getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String)
 Get the double value for a specific integrator setting.
 """
@@ -2081,7 +2160,7 @@ function getCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::St
   return ccall(dlsym(rrlib, :getCurrentIntegratorParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::String, value::Float64)
 Set the double value for a specific integrator setting.
 """
@@ -2092,7 +2171,7 @@ function setCurrentIntegratorParameterDouble(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
-""""
+"""
     getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::String)
 Get the string value for a specific integrator setting.
 """
@@ -2100,7 +2179,7 @@ function getCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::St
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentIntegratorParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
-""""
+"""
     getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
 Compute the eigenvalues of a double matrix.
 """
@@ -2111,7 +2190,7 @@ function setCurrentIntegratorParameterString(rr::Ptr{Nothing}, parameterName::St
   end
 end
 
-""""
+"""
     getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
 Get the boolean value for a specific integrator setting.
 """
@@ -2120,7 +2199,7 @@ function getCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::S
 end
 
 ## Attention Return False
-""""
+"""
     setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
 Set the boolean value for a specific integrator setting.
 """
@@ -2131,7 +2210,7 @@ function setCurrentIntegratorParameterBoolean(rr::Ptr{Nothing}, parameterName::S
   end
 end
 
-""""
+"""
     getNumRegisteredSteadyStateSolvers()
 Get the number of registered steady state solvers.
 """
@@ -2139,7 +2218,7 @@ function getNumRegisteredSteadyStateSolvers()
   return ccall(dlsym(rrlib, :getNumRegisteredIntegrators), cdecl, Cint, ())
 end
 
-""""
+"""
     getRegisteredSteadyStateSolverName(n::Int64)
 Get the name of a registered steady state solver (e.g. cvode etc.)
 """
@@ -2147,7 +2226,7 @@ function getRegisteredSteadyStateSolverName(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverName), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
-""""
+"""
     getRegisteredSteadyStateSolverHint(n::Int64)
 Get the hint of a registered steady state solver (e.g. cvode etc.)
 """
@@ -2155,7 +2234,7 @@ function getRegisteredSteadyStateSolverHint(n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getRegisteredSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Cint, ), n))
 end
 
-""""
+"""
     getRegisteredSteadyStateSolverDescription(n::Int64)
 Get the description of a registered steady state solver (e.g. cvode etc.)
 """
@@ -2164,7 +2243,7 @@ function getRegisteredSteadyStateSolverDescription(n::Int64)
 end
 
 ## Attention Return False
-""""
+"""
     setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::String)
 Specify the current steady state solver to be used for simulation.
 This method instantiates a new steady state solver of the given type (e.g. cvode, gillespie) if one does not currently exist. Otherwise, the existing steady state solver of this type is used.
@@ -2176,7 +2255,7 @@ function setCurrentSteadyStateSolver(rr::Ptr{Nothing}, nameOfSteadyStateSolver::
   end
 end
 
-""""
+"""
     getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
 Obtain a description of the current steady state solver.
 """
@@ -2184,7 +2263,7 @@ function getCurrentSteadyStateSolverName(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
 Obtain a description of the current steady state solver.
 """
@@ -2192,7 +2271,7 @@ function getCurrentSteadyStateSolverDescription(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
 Obtain a short hint for the current steady state solver.
 """
@@ -2200,7 +2279,7 @@ function getCurrentSteadyStateSolverHint(rr::Ptr{Nothing})
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, ), rr))
 end
 
-""""
+"""
     getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
 Get the number of adjustable settings for the current steady state solver.
 """
@@ -2208,7 +2287,7 @@ function getNumberOfCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverHint), cdecl, Cint, (Ptr{Nothing}, ), rr)
 end
 
-""""
+"""
     getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
 Get the name of a parameter of the current steady state solver.
 """
@@ -2216,7 +2295,7 @@ function getCurrentSteadyStateSolverNthParameterName(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n::Int64)
 Get the display name of a parameter of the current steady state solver.
 """
@@ -2224,14 +2303,14 @@ function getCurrentSteadyStateSolverNthParameterDisplayName(rr::Ptr{Nothing}, n:
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDisplayName), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
 Get the description of a parameter of the current integrator.
 """
 function getCurrentSteadyStateSolverNthParameterDescription(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
-""""
+"""
     getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
 Get the hint of a parameter of the current steady state solver.
 """
@@ -2239,7 +2318,7 @@ function getCurrentSteadyStateSolverNthParameterHint(rr::Ptr{Nothing}, n::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Cint), rr, n))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
 Get the type of a parameter of the current steady state solver.
 """
@@ -2248,7 +2327,7 @@ function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
 end
 
 ## Attention Return False
-""""
+"""
     resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
 Reset the steady state solver parameters to their default values.
 """
@@ -2259,7 +2338,7 @@ function resetCurrentSteadyStateSolverParameters(rr::Ptr{Nothing})
   end
 end
 
-""""
+"""
     solverTypeToString(code::Int64)
 Compute the eigenvalues of a double matrix.
 """
@@ -2267,7 +2346,7 @@ function solverTypeToString(code::Int64)
   return unsafe_string(ccall(dlsym(rrlib, :solverTypeToString), cdecl, Ptr{UInt8}, (Cint, ), code))
 end
 
-""""
+"""
     getEigenvaluesVector(mat::Ptr{RRDoubleMatrix})
 Get a string description of the type [STATIC MEMORY - DO NOT FREE] Can call on return value of e.g. getCurrentSteadyStateSolverNthParameterType to retrieve human-readable string representation.
 """
@@ -2276,7 +2355,7 @@ function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
 end
 
 ## RRString helper function
-""""
+"""
     getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
 Get the names of adjustable settings for the current steady state solver.
 """
@@ -2284,7 +2363,7 @@ function getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :getListOfCurrentSteadyStateSolverParameterNames), cdecl, Ptr{RRStringArray}, (Ptr{Nothing}, ), rr)
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, parameterName::String)
 GGet the description for a specific steady state solver setting.
 """
@@ -2292,7 +2371,7 @@ function getCurrentSteadyStateSolverParameterDescription(rr::Ptr{Nothing}, param
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterDescription), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterName::String)
 Get the hint of a parameter of the current steady state solver.
 """
@@ -2300,7 +2379,7 @@ function getCurrentSteadyStateSolverParameterHint(rr::Ptr{Nothing}, parameterNam
   return unsafe_string(ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterHint), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName))
 end
 
-""""
+"""
     etCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterName::String)
 Get the type of a parameter of the current steady state solver.
 """
@@ -2308,7 +2387,7 @@ function getCurrentSteadyStateSolverParameterType(rr::Ptr{Nothing}, parameterNam
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterType), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
 Get the integer value for a specific steady state solver setting.
 """
@@ -2316,7 +2395,7 @@ function getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterInt), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName::String)
 Get the integer value for a specific steady state solver setting.
 """
@@ -2327,7 +2406,7 @@ function setCurrentSteadyStateSolverParameterInt(rr::Ptr{Nothing}, parameterName
   end
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String)
 Get the unsigned integer value for a specific steady state solver setting.
 """
@@ -2335,7 +2414,7 @@ function getCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterNam
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cuint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterName::String, value::Int64)
 Set the unsigned integer value for a specific steady state solver setting.
 """
@@ -2346,7 +2425,7 @@ function setCurrentSteadyStateSolverParameterUInt(rr::Ptr{Nothing}, parameterNam
   end
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
 Get the double value for a specific steady state solver setting.
 """
@@ -2354,7 +2433,7 @@ function getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterN
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterUInt), cdecl, Cdouble, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterName::String)
 Set the double value for a specific steady state solver setting.
 """
@@ -2365,7 +2444,7 @@ function setCurrentSteadyStateSolverParameterDouble(rr::Ptr{Nothing}, parameterN
   end
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String)
 Get the double value for a specific steady state solver setting.
 """
@@ -2373,7 +2452,7 @@ function getCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterN
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterString), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
 
-""""
+"""
     setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterName::String, value::String)
 Set the string value for a specific steady state solver setting.
 """
@@ -2384,14 +2463,14 @@ function setCurrentSteadyStateSolverParameterString(rr::Ptr{Nothing}, parameterN
   end
 end
 
-""""
+"""
     getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
 Get the boolean value for a specific steady state solver setting.
 """
 function getCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String)
   return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverParameterBoolean), cdecl, Cint, (Ptr{Nothing}, Ptr{UInt8}), rr, parameterName)
 end
-""""
+"""
     setCurrentSteadyStateSolverParameterBoolean(rr::Ptr{Nothing}, parameterName::String, value::Int64)
 Set the boolean value for a specific steady state solver setting.
 """
@@ -2406,7 +2485,7 @@ end
 #                        Configuration Keys and Values                        #
 ###############################################################################
 
-""""
+"""
     setConfigBool(key::String, value::Bool)
     Set a boolean configuration value.
 """
@@ -2423,7 +2502,13 @@ function setConfigBool(key::String, value::Bool)
     return status
 end
 
-""""
+#self
+#function setConfigBool(key::String, value::Int64)
+#    ccall(dlsym(rrlib, :setConfigBool), cdecl, Int64, (Ptr{UInt8}, Cint), key, value)
+#end
+
+
+"""
     getConfigBool(key::String)
 Get a boolean configuration value.
 """
@@ -2431,19 +2516,20 @@ function getConfigBool(key::String)
   return ccall(dlsym(rrlib, :getConfigBool), cdecl, Bool, (Ptr{UInt8},), key)
 end
 
-""""
+"""
     setConfigInt(key::String, value::Int64)
 Set an integer configuration value.
 """
+#self checked: setConfigInt
 function setConfigInt(key::String, value::Int64)
     status = ccall(dlsym(rrlib, :setConfigInt), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
-    println(status)
+    #println(status)
     if status == false
       error(getLastError())
     end
 end
 
-""""
+"""
     getConfigInt(key::String)
 Get an integer configuration value.
 """
@@ -2451,7 +2537,7 @@ function getConfigInt(key::String)
   return ccall(dlsym(rrlib, :getConfigInt), cdecl, Int64, (Ptr{UInt8},), key)
 end
 
-""""
+"""
     setConfigDouble(key::String, value::Float64)
 Set a double configuration value.
 """
@@ -2462,7 +2548,7 @@ function setConfigDouble(key::String, value::Float64)
   end
 end
 
-""""
+"""
     getConfigDouble(key::String)
 Get a double configuration value.
 """
@@ -2470,7 +2556,7 @@ function getConfigDouble(key::String)
   return ccall(dlsym(rrlib, :getConfigDouble), cdecl, Float64, (Ptr{UInt8},), key)
 end
 
-""""
+"""
     getListOfConfigKeys()
 Get a list of all possible config keys.
 """
@@ -2490,9 +2576,7 @@ end
 
 
 
-
-
-
+#This function is not in C API
 function resultsToJulia(resultHandle)
   rows = getRRDataNumRows(resultHandle)
   cols = getRRDataNumCols(resultHandle)
@@ -2505,6 +2589,7 @@ function resultsToJulia(resultHandle)
   return results
 end
 
+#This function is not in C API
 function resultsColumn(resultHandle, column::Int64)
   rows = getRRDataNumRows(resultHandle)
   #results = Array(Float64, rows)
@@ -2515,18 +2600,25 @@ function resultsColumn(resultHandle, column::Int64)
   return results
 end
 
+#This function is not in C API
 function createRRCData(rrDataHandle)
     return ccall(dlsym(rrlib, :createRRCData), cdecl, UInt, (Ptr{Nothing},), rrDataHandle)
 end
 
-function getGlobalParameterIdsNew(rr)
-  return unsafe_load(ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr))
-end
+#delete the following two functions
+#function getGlobalParameterIdsNew(rr)
+#  return unsafe_load(ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr))
+#end
 
-function getGlobalParameterIdsNoLoad(rr)
-  return ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
-end
+#function getGlobalParameterIdsNoLoad(rr)
+#  return ccall(dlsym(rrlib, :getGlobalParameterIds), cdecl, Ptr{RRStringArray}, (Ptr{Nothing},), rr)
+#end
 
+#self same: addSpecies
+"""
+    addSpecies(rr::Ptr{Nothing}, sid::String, compartment::String, initialAmount::Float64, substanceUnit::String, regen::Bool)
+Add a species to the current model.
+"""
 function addSpecies(rr::Ptr{Nothing}, sid::String, compartment::String, initialAmount::Float64, substanceUnit::String, regen::Bool)
   status = false
   if regen == true
@@ -2539,6 +2631,10 @@ function addSpecies(rr::Ptr{Nothing}, sid::String, compartment::String, initialA
   end
 end
 
+"""
+    removeSpecies(rr::Ptr{Nothing}, sid::String, regen::Bool)
+Remove a species from the current model.
+"""
 function removeSpecies(rr::Ptr{Nothing}, sid::String, regen::Bool)
   status = false
   if regen == true
@@ -2551,6 +2647,11 @@ function removeSpecies(rr::Ptr{Nothing}, sid::String, regen::Bool)
   end
 end
 
+#self same: addCompartment
+"""
+    addCompartment(rr, cid::String, initVolume::Float64, regen::Bool)
+Add a compartment to the current model.
+"""
 function addCompartment(rr, cid::String, initVolume::Float64, regen::Bool)
   status = false
   if regen == true
@@ -2563,10 +2664,31 @@ function addCompartment(rr, cid::String, initVolume::Float64, regen::Bool)
   end
 end
 
+"""
+    removeCompartment(rr, cid::String, regen::Bool)
+Remove a compartment from the current model.
+"""
+function removeCompartment(rr, cid::String, regen::Bool)
+  status = false
+  if regen == true
+    status = ccall(dlsym(rrlib, :removeCompartment), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, cid)
+  else
+    status = ccall(dlsym(rrlib, :removeCompartmentNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, cid)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addReaction(rr::Ptr{Nothing}, rid::String, reactants::Array{String}, products::Array{String}, kineticLaw::String, regen::Bool)
+Add a reaction to the current model by passing its info as parameters.
+"""
+#self not same addReaction
 function addReaction(rr::Ptr{Nothing}, rid::String, reactants::Array{String}, products::Array{String}, kineticLaw::String, regen::Bool)
   numReactants = length(reactants)
   numProducts = length(products)
-  status = 0
+  status = 0 # false
   if regen == true
     status = ccall(dlsym(rrlib, :addReaction), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{Ptr{UInt8}}, Cint, Ptr{Ptr{UInt8}}, Cint, Ptr{UInt8}), rr, rid, reactants, numReactants, products, numProducts, kineticLaw)
   else
@@ -2577,6 +2699,11 @@ function addReaction(rr::Ptr{Nothing}, rid::String, reactants::Array{String}, pr
   end
 end
 
+# self same: removeReaction
+"""
+    removeReaction(rr::Ptr{Nothing}, rid::String, regen::Bool)
+Remove a reaction from the current model.
+"""
 function removeReaction(rr::Ptr{Nothing}, rid::String, regen::Bool)
   status = false
   if regen == true
@@ -2589,7 +2716,11 @@ function removeReaction(rr::Ptr{Nothing}, rid::String, regen::Bool)
   end
 end
 
-
+# self same: addParameter
+"""
+    addParameter(rr::Ptr{Nothing}, pid::String, value::Float64, forceRegen::Bool)
+Add a parameter to the current model.
+"""
 function addParameter(rr::Ptr{Nothing}, pid::String, value::Float64, forceRegen::Bool)
   status = false
   if forceRegen == true
@@ -2602,6 +2733,11 @@ function addParameter(rr::Ptr{Nothing}, pid::String, value::Float64, forceRegen:
   end
 end
 
+#self same: removeParameter
+"""
+    removeParameter(rr::Ptr{Nothing}, pid::String, forceRegen::Bool)
+Remove a parameter from the current model.
+"""
 function removeParameter(rr::Ptr{Nothing}, pid::String, forceRegen::Bool)
   status = false
   if forceRegen == true
@@ -2614,6 +2750,189 @@ function removeParameter(rr::Ptr{Nothing}, pid::String, forceRegen::Bool)
   end
 end
 
+#complete https://libroadrunner.readthedocs.io/en/latest/api_reference.html#model-editing
+"""
+    setKineticLaw(rr::Ptr{Nothing}, rid::String, kineticLaw::String, forceRegen::Bool)
+Set the kinetic law for an existing reaction in the current model.
+"""
+function setKineticLaw(rr::Ptr{Nothing}, rid::String, kineticLaw::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :setKineticLaw), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, rid, kineticLaw)
+  else
+    status = ccall(dlsym(rrlib, :setKineticLawNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, rid, kineticLaw)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addAssignmentRule(rr::Ptr{Nothing}, vid::String, formula::String, forceRegen::Bool)
+Add an assignment rule for a variable to the current model.
+"""
+function addAssignmentRule(rr::Ptr{Nothing}, vid::String, formula::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addAssignmentRule), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, vid, formula)
+  else
+    status = ccall(dlsym(rrlib, :addAssignmentRuleNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, vid, formula)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addRateRule(rr::Ptr{Nothing}, vid::String, formula::String, forceRegen::Bool)
+Add a rate rule for a variable to the current model.
+"""
+function addRateRule(rr::Ptr{Nothing}, vid::String, formula::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addRateRule), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, vid, formula)
+  else
+    status = ccall(dlsym(rrlib, :addRateRuleNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, vid, formula)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    removeRules(rr::Ptr{Nothing}, vid::String, forceRegen::Bool)
+Remove all rules for a variable from the current model, including assignment and rate rules.
+"""
+function removeRules(rr::Ptr{Nothing}, vid::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :removeRules), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, vid)
+  else
+    status = ccall(dlsym(rrlib, :removeRulesNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, vid)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addEvent(rr::Ptr{Nothing}, eid::String, useValuesFromTriggerTime::Bool, trigger::String, forceRegen::Bool)
+Add an event to the current model.
+"""
+function addEvent(rr::Ptr{Nothing}, eid::String, useValuesFromTriggerTime::Bool, trigger::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addEvent), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool, Ptr{UInt8}), rr, eid, useValuesFromTriggerTime, trigger)
+  else
+    status = ccall(dlsym(rrlib, :addEventNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Bool, Ptr{UInt8}), rr, vid, useValuesFromTriggerTime, trigger)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addTrigger(rr::Ptr{Nothing}, eid::String, trigger::String, forceRegen::Bool)
+Add trigger to an existing event in the model.
+"""
+function addTrigger(rr::Ptr{Nothing}, eid::String, trigger::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addTrigger), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, trigger)
+  else
+    status = ccall(dlsym(rrlib, :addTriggerNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, trigger)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addPriority(rr::Ptr{Nothing}, eid::String, priority::String, forceRegen::Bool)
+Add priority to an existing event in the model.
+"""
+function addPriority(rr::Ptr{Nothing}, eid::String, priority::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addPriority), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, priority)
+  else
+    status = ccall(dlsym(rrlib, :addPriorityNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, priority)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addDelay(rr::Ptr{Nothing}, eid::String, delay::String, forceRegen::Bool)
+Add delay to an existing event in the model.
+"""
+
+function addDelay(rr::Ptr{Nothing}, eid::String, delay::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addDelay), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, delay)
+  else
+    status = ccall(dlsym(rrlib, :addDelayNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, delay)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    addEventAssignment(rr::Ptr{Nothing}, eid::String, vid::String, formulae::String, forceRegen::Bool)
+Add an event assignment to an existing event in the model.
+"""
+function addEventAssignment(rr::Ptr{Nothing}, eid::String, vid::String, formulae::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :addEventAssignment), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, vid, formulae)
+  else
+    status = ccall(dlsym(rrlib, :addEventAssignmentNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, vid, formula)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    removeEventAssignments(rr::Ptr{Nothing}, eid::String, vid::String, forceRegen::Bool)
+Add all event assignments for a variable from an existing event in the model.
+"""
+function removeEventAssignments(rr::Ptr{Nothing}, eid::String, vid::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :removeEventAssignments), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, vid)
+  else
+    status = ccall(dlsym(rrlib, :removeEventAssignmentsNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}, Ptr{UInt8}), rr, eid, vid)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+"""
+    removeEvent(rr::Ptr{Nothing}, eid::String, forceRegen::Bool)
+Remove an event from the current model.
+"""
+function removeEvent(rr::Ptr{Nothing}, eid::String, forceRegen::Bool)
+  status = false
+  if forceRegen == true
+     status = ccall(dlsym(rrlib, :removeEvent), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, eid)
+  else
+    status = ccall(dlsym(rrlib, :removeEventNoRegen), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, eid)
+  end
+  if status == false
+    error(getLastError())
+  end
+end
+
+
+#self the same: setBoundary
+"""
+    setBoundary(rr::Ptr{Nothing}, sid::String, boundaryCondition::Bool, forceRegen::Bool)
+"""
 function setBoundary(rr::Ptr{Nothing}, sid::String, boundaryCondition::Bool, forceRegen::Bool)
   status = false
   if forceRegen == true
@@ -2626,10 +2945,18 @@ function setBoundary(rr::Ptr{Nothing}, sid::String, boundaryCondition::Bool, for
   end
 end
 
+"""
+    isModelLoaded(rr::Ptr{Nothing})
+check if a model is loaded
+"""
 function isModelLoaded(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Int8, (Ptr{Nothing}, ), rr)
+  return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing}, ), rr)
 end
 
+"""
+    getParamPromotedSBML(rr::Ptr{Nothing}, sArg::String)
+Promote any local parameters to global status.
+"""
 function getParamPromotedSBML(rr::Ptr{Nothing}, sArg::String)
   return unsafe_string(ccall(dlsym(rrlib, :getParamPromotedSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing}, Ptr{UInt8}), rr, sArg))
 end
