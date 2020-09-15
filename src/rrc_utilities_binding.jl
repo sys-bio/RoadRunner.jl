@@ -1,4 +1,31 @@
-include("rrc_types.jl")
+struct RRVector
+end
+
+struct RRStringArray
+end
+
+struct RRDoubleMatrix
+end
+
+struct RRComplex
+end
+
+struct RRComplexVector
+end
+
+struct RRComplexMatrix
+end
+
+struct RRCData
+end
+
+struct RRList
+end
+
+struct RRListItem
+end
+
+@enum ListItemType litString litInteger litDouble litList
 
 """
     getFileContent(fName::String)
@@ -7,7 +34,6 @@ Retrieves the the content of a file.
 function getFileContent(fName::String)
   char_pointer = ccall(dlsym(rrlib, :getFileContent), cdecl, Ptr{UInt8}, (Ptr{UInt8},), fName)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -18,7 +44,6 @@ Creates memory for holding a string.
 function createText(text::String)
   char_pointer = ccall(dlsym(rrlib, :createText), cdecl, Ptr{UInt8}, (Ptr{UInt8},), text)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -29,7 +54,6 @@ Creates memory for holding a string.
 function createTextMemory(count::Int64)
   char_pointer = ccall(dlsym(rrlib, :createTextMemory), cdecl, Ptr{UInt8}, (Int64,), count)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -58,12 +82,19 @@ function createRRList()
   return ccall(dlsym(rrlib, :createRRList), cdecl, Ptr{RRList}, ())
 end
 
+#function createRRList()
+#  list = ccall(dlsym(rrlib, :createRRList), cdecl, Ptr{RRList}, ())
+#  result = listToString(list)
+#  freeRRList(list)
+#  return result
+#end
+
 """
     freeRRList(theList)
 Free RRListPtr structure, i.e destroy a list.
 """
 function freeRRList(theList)
-  ccall(dlsym(rrlib, :freeRRList), cdecl, Nothing, (Ptr{RRList},), theList)
+  ccall(dlsym(rrlib, :freeRRList), cdecl, Cvoid, (Ptr{RRList},), theList)
 end
 
 """
@@ -122,7 +153,6 @@ function getListItem(list::Ptr{RRList}, index::Int64)
   return ccall(dlsym(rrlib, :getListItem), cdecl, Ptr{RRListItem}, (Ptr{RRList}, Int64), list, index)
 end
 
-# Attention Return False
 """
     isListItemInteger(item::Ptr{RRListItem})
 Return true or false if the list item is an integer.
@@ -131,16 +161,14 @@ function isListItemInteger(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemInteger ), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
-# Attention Return False
 """
     isListItemDouble(item::Ptr{RRListItem})
 Return true or false if the list item is a double.
 """
 function isListItemDouble(item::Ptr{RRListItem})
-  return ccall(dlsym(rrlib, :isListItemDouble ), cdecl, Bool, (Ptr{RRListItem},), item)
+  return ccall(dlsym(rrlib, :isListItemDouble), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
-## Attention Return False
 """
     isListItemString(item::Ptr{RRListItem})
 Return true or false if the list item is a character array.
@@ -149,7 +177,6 @@ function isListItemString(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemString), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
-## Attention Return False
 """
     isListItemList(item::Ptr{RRListItem})
 Return true or false if the list item is a list itself.
@@ -158,13 +185,12 @@ function isListItemList(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :isListItemList), cdecl, Bool, (Ptr{RRListItem},), item)
 end
 
-## Attention Return False
 """
     isListItem(item::Ptr{RRListItem}, itemType)
 Returns true or false if the list item is the given itemType.
 """
 function isListItem(item::Ptr{RRListItem}, itemType)
-  return ccall(dlsym(rrlib, :isListItem), cdecl, Bool, (Ptr{RRListItem}, Ptr{Nothing}), item, itemType)
+  return ccall(dlsym(rrlib, :isListItem), cdecl, Bool, (Ptr{RRListItem}, ListItemType), item, itemType)
 end
 
 """
@@ -186,23 +212,23 @@ Return the double from a list item.
 """
 function getDoubleListItem(item::Ptr{RRListItem})
   value = Array{Float64}(undef,1)
-  status = ccall(dlsym(rrlib, :getDoubleListItem ), cdecl, Bool, (Ptr{RRListItem}, Ptr{Float64}), item, value)
+  status = ccall(dlsym(rrlib, :getDoubleListItem), cdecl, Bool, (Ptr{RRListItem}, Ptr{Float64}), item, value)
   if status == false
     error(getLastError())
   end
   return value[1]
 end
 
-## Attention Return Null
 """
     getStringListItem(item::Ptr{RRListItem})
 Return the string from a list item.
 """
 function getStringListItem(item::Ptr{RRListItem})
-  return bytestring(ccall(dlsym(rrlib, :getStringListItem), cdecl, Ptr{UInt8}, (Ptr{RRListItem},), item))
+  char_pointer = ccall(dlsym(rrlib, :getStringListItem), cdecl, Ptr{UInt8}, (Ptr{RRListItem},), item)
+  julia_str = unsafe_string(char_pointer)
+  return julia_str
 end
 
-# Attention Return Null
 """
     getList(item::Ptr{RRListItem})
 Return a list from a list item if it contains a list.
@@ -210,11 +236,9 @@ Return a list from a list item if it contains a list.
 function getList(item::Ptr{RRListItem})
   return ccall(dlsym(rrlib, :getList), cdecl, Ptr{RRList}, (Ptr{RRListItem},), item)
 end
-
 ###############################################################################
 #                              Helper Routines                                #
 ###############################################################################
-
 """
     getVectorLength(vector::Ptr{RRVector})
 Get the number of elements in a vector type.
@@ -231,25 +255,18 @@ function createVector(size::Int64)
   return ccall(dlsym(rrlib, :createVector), cdecl, Ptr{RRVector}, (Int64,), size)
 end
 
-#needs double check: getVectorElement
 """
     getVectorElement(vector::Ptr{RRVector}, index::Int64)
 Get a particular element from a vector.
 """
 function getVectorElement(vector::Ptr{RRVector}, index::Int64)
   value = Array{Float64}(undef,1)
-  status = ccall(dlsym(rrlib, :getVectorElement), cdecl, Bool, (Ptr{RRVector}, Int64, Ptr{Float64}), vector, index, value)
+  status = ccall(dlsym(rrlib, :getVectorElement), cdecl, Bool, (Ptr{RRVector}, Int64, Ptr{Cdouble}), vector, index, value)
   if status == false
     error(getLastError())
   end
   return value[1]
 end
-
-#function getVectorElement(vector::Ptr{RRVector}, index::Int64)
-#  value = Array{Float64}(undef,1)
-#  ccall(dlsym(rrlib, :getVectorElement), cdecl, Bool, (Ptr{RRVector}, Int64, Ptr{Cdouble}), vector, index, value)
-#  return value[1]
-#end
 
 """
     setVectorElement(vector::Ptr{RRVector}, index::Int64, value::Float64)
@@ -286,7 +303,6 @@ function getMatrixNumCols(m::Ptr{RRDoubleMatrix})
   return ccall(dlsym(rrlib, :getMatrixNumCols), cdecl, Int64, (Ptr{RRDoubleMatrix},), m)
 end
 
-#self checked: getMatrixElement
 """
     getMatrixElement(m::Ptr{RRDoubleMatrix}, r::Int64, c::Int64)
 Retrieve an element at a given row and column from a matrix type variable.
@@ -300,7 +316,6 @@ function getMatrixElement(m::Ptr{RRDoubleMatrix}, r::Int64, c::Int64)
   return value[1]
 end
 
-#self checked: setMatrixElement
 """
     setMatrixElement(m::Ptr{RRDoubleMatrix}, r::Int64, c::Int64, value::Float64)
 Set an element at a given row and column with a given value in a matrix type variable.
@@ -336,7 +351,6 @@ function setComplexMatrixElement(m::Ptr{RRComplexMatrix}, r::Int64, c::Int64, va
   end
 end
 
-#self the same: getRRDataNumRows
 """
     getRRDataNumRows(rrData::Ptr{RRCData})
 Retrieve the number of rows in the given RoadRunner numerical data (returned from simulate(RRHandle handle))
@@ -345,7 +359,6 @@ function getRRDataNumRows(rrData::Ptr{RRCData})
   return ccall(dlsym(rrlib, :getRRDataNumRows), cdecl, Int64, (Ptr{RRCData},), rrData)
 end
 
-#self the same: getRRDataNumCols
 """
     getRRDataNumCols(rrData::Ptr{RRCData})
 Retrieve the number of columns in the given RoadRunner numerical data (returned from simulate(RRHandle handle))
@@ -354,7 +367,6 @@ function getRRDataNumCols(rrData::Ptr{RRCData})
   return ccall(dlsym(rrlib, :getRRDataNumCols), cdecl, Int64, (Ptr{RRCData},), rrData)
 end
 
-#self the same: getRRDataElement
 """
     function getRRCDataElement(rrData::Ptr{RRCData}, r::Int64, c::Int64)
 Retrieves an element at a given row and column from a RoadRunner data type variable.
@@ -368,7 +380,6 @@ function getRRCDataElement(rrData::Ptr{RRCData}, r::Int64, c::Int64)
   return value[1]
 end
 
-#self the same: getRRDataColumnLabel
 """
     getRRDataColumnLabel(rrData::Ptr{RRCData}, column::Int64)
 Retrieves a label for a given column in a rrData type variable.
@@ -376,7 +387,6 @@ Retrieves a label for a given column in a rrData type variable.
 function getRRDataColumnLabel(rrData::Ptr{RRCData}, column::Int64)
   char_pointer = ccall(dlsym(rrlib, :getRRDataColumnLabel), cdecl, Ptr{UInt8}, (Ptr{RRCData}, Int64), rrData, column)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -410,10 +420,9 @@ end
 Returns a vector in string form.
 """
 function vectorToString(vecHandle::Ptr{RRVector})
-   char_pointer = ccall(dlsym(rrlib, :vectorToString), cdecl, Ptr{UInt8}, (Ptr{RRVector},), vecHandle)
-   julia_str = unsafe_string(char_pointer)
-   freeText(char_pointer)
-   return julia_str
+  char_pointer = ccall(dlsym(rrlib, :vectorToString), cdecl, Ptr{UInt8}, (Ptr{RRVector},), vecHandle)
+  julia_str = unsafe_string(char_pointer)
+  return julia_str
 end
 
 """
@@ -423,7 +432,6 @@ Returns a complex vector in string form.
 function complexVectorToString(vecHandle::Ptr{RRComplexVector})
   char_pointer = ccall(dlsym(rrlib, :complexVectorToString), cdecl, Ptr{UInt8}, (Ptr{RRComplexVector},), vecHandle)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -434,7 +442,6 @@ Returns a rrCData struct in string form.
 function rrCDataToString(rrData::Ptr{RRCData})
   char_pointer = ccall(dlsym(rrlib, :rrCDataToString), cdecl, Ptr{UInt8}, (Ptr{RRCData},), rrData)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -445,7 +452,6 @@ Returns a matrix in string form.
 function matrixToString(matrixHandle::Ptr{RRDoubleMatrix})
   char_pointer = ccall(dlsym(rrlib, :matrixToString), cdecl, Ptr{UInt8}, (Ptr{RRDoubleMatrix},), matrixHandle)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -456,7 +462,6 @@ Returns a complex matrix in string form.
 function complexMatrixToString(matrixHandle::Ptr{RRComplexMatrix})
   char_pointer = ccall(dlsym(rrlib, :complexMatrixToString), cdecl, Ptr{UInt8}, (Ptr{RRComplexMatrix},), matrixHandle)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -467,7 +472,6 @@ Returns a string list in string form.
 function stringArrayToString(list::Ptr{RRStringArray})
   char_pointer = ccall(dlsym(rrlib, :stringArrayToString), cdecl, Ptr{UInt8}, (Ptr{RRStringArray},), list)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
@@ -476,10 +480,9 @@ end
 Returns a list in string form.
 """
 function listToString(list::Ptr{RRList})
-   char_pointer = ccall(dlsym(rrlib, :listToString), cdecl, Ptr{UInt8}, (Ptr{RRList},), list)
-   julia_str = unsafe_string(char_pointer)
-   freeText(char_pointer)
-   return julia_str
+  char_pointer = ccall(dlsym(rrlib, :listToString), cdecl, Ptr{UInt8}, (Ptr{RRList},), list)
+  julia_str = unsafe_string(char_pointer)
+  return julia_str
 end
 
 ###############################################################################
@@ -493,7 +496,6 @@ function getNumberOfStringElements(list::Ptr{RRStringArray})
   return ccall(dlsym(rrlib, :getNumberOfStringElements), cdecl, Int64, (Ptr{RRStringArray},), list)
 end
 
-#self the same: getStringElement
 """
     getStringElement(list::Ptr{RRStringArray}, index::Int64)
 Returns the indexth element from the string array in the argument value.
@@ -501,14 +503,12 @@ Returns the indexth element from the string array in the argument value.
 function getStringElement(list::Ptr{RRStringArray}, index::Int64)
   char_pointer = ccall(dlsym(rrlib, :getStringElement), cdecl, Ptr{UInt8}, (Ptr{RRStringArray}, Int64), list, index)
   julia_str = unsafe_string(char_pointer)
-  freeText(char_pointer)
   return julia_str
 end
 
 ###############################################################################
 #                          Free Memory Routines                               #
 ###############################################################################
-#self same: freeRRCData
 """
     freeRRCData(handle::Ptr{RRCData})
 Free the memory associated to a RRCData object.
@@ -520,19 +520,17 @@ function freeRRCData(handle::Ptr{RRCData})
   end
 end
 
-#self the same: freeText
 """
-    freeText(text::Ptr{UInt8})
+    freetext(text::Ptr{UInt8})
 Free char* generated by library routines.
 """
-function freeText(text::Ptr{UInt8})
-  status = ccall(dlsym(rrlib, :freeText), cdecl, Bool, (Ptr{UInt8},), text)
+function freetext(text::Ptr{UInt8})
+  status = ccall(dlsym(rrlib, :freetext), cdecl, Bool, (Ptr{UInt8},), text)
   if status == false
     (error(getLastError()))
   end
 end
 
-#self the same: freeStringArray
 """
     freeStringArray(sl::Ptr{RRStringArray})
 Free RRStringListHandle structures
@@ -544,7 +542,6 @@ function freeStringArray(sl::Ptr{RRStringArray})
   end
 end
 
-#self checked: freeVector
 """
     freeVector(vector::Ptr{RRVector})
 Free RRVectorHandle structures.
@@ -556,7 +553,6 @@ function freeVector(vector::Ptr{RRVector})
   end
 end
 
-#self the same: freeMatrix
 """
     freeMatrix(matrix::Ptr{RRDoubleMatrix})
 Free RRDoubleMatrixPtr structures.
@@ -568,7 +564,7 @@ function freeMatrix(matrix::Ptr{RRDoubleMatrix})
   end
 end
 
-#the two functions below are not available in CAPI
+#the two functions below are not available in C API, but as Helper
 """
     convertStringArrayToJuliaArray(list::Ptr{RRStringArray})
 """
@@ -592,7 +588,6 @@ end
 """
 function convertRRVectorToJuliaArray(vector::Ptr{RRVector})
   julia_arr = Float64[]
-
   try
     num_elem = getVectorLength(vector)
     for i = 1:num_elem
