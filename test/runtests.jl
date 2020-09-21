@@ -1,6 +1,3 @@
-using RoadRunner
-using Test
+using SafeTestsets
 
-@testset "RoadRunner.jl" begin
-    # Write your own tests here.
-end
+@safetestset "my f Tests" begin include("my_f_test.jl") end
