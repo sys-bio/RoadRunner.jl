@@ -1,4 +1,4 @@
-using Libdl
+#using Libdl
 #rrlib = Libdl.dlopen("roadrunner_c_api.dll")
 
 include("rrc_types.jl")
