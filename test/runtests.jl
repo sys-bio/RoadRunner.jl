@@ -1,6 +1,6 @@
 using SafeTestsets
 
-@safetestset "my f Tests" begin include("my_f_test.jl") end
+#@safetestset "my f Tests" begin include("my_f_test.jl") end
 
 #@safetestset "antimony test" begin include("antimony_test_0.jl") end
 
@@ -20,4 +20,4 @@ using SafeTestsets
 
 #@safetestset "antimony test" begin include("antimony_test_8.jl") end
 
-#@safetestset "sbml test" begin include("sbml_test.jl") end
+@safetestset "sbml test" begin include("sbml_test.jl") end
