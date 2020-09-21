@@ -13,6 +13,13 @@ end
 
 using Libdl
 using Plots
+
+current_dir = @__DIR__
+rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
+antimony_api = joinpath(current_dir, "libantimony.dll")
+rrlib = Ptr{Nothing}
+antlib = Ptr{Nothing}
+
 #rrlib = Libdl.dlopen("roadrunner_c_api.dll")
 #antlib = Libdl.dlopen("libantimony.dll")
 
