@@ -1,10 +1,10 @@
 module RoadRunner
-
+__precompile__(false)
 #export my_f #, another function to export
 #export my_f(x,y)
 
 #my_f(x,y) = 2x +3y
-
+#export createRRInstance
 
 function my_f(x,y)
   out = 2x +3y
@@ -12,22 +12,23 @@ function my_f(x,y)
 end
 
 using Libdl
-using Plots
-
 current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
 antimony_api = joinpath(current_dir, "libantimony.dll")
 rrlib = Ptr{Nothing}
 antlib = Ptr{Nothing}
 
-#rrlib = Libdl.dlopen("roadrunner_c_api.dll")
-#antlib = Libdl.dlopen("libantimony.dll")
 
 include("rrc_utilities_binding.jl")
 include("antimony_binding.jl")
 include("rrc_types.jl")
 
 @enum CLogLevel CL_PRIO_FATAL CL_PRIO_CRITICAL CL_PRIO_ERROR CL_PRIO_WARNING CL_PRIO_NOTICE CL_PRIO_INFORMATION CL_PRIO_DEBUG CL_PRIO_TRACE
+
+function __init__()
+  global rrlib = Libdl.dlopen(rr_api)
+  global antlib = Libdl.dlopen(antimony_api)
+end
 
 """
     loada(antString::String)
