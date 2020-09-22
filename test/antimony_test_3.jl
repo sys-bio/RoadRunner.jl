@@ -33,6 +33,6 @@ end
     @test RoadRunner.getFloatingSpeciesIds(rr) == ["S2", "S3", "S4"]
     @test RoadRunner.getNumberOfBoundarySpecies(rr) == 1
     @test RoadRunner.getBoundarySpeciesIds(rr) == ["S1"]
-    @test RoadRunner.getFloatingSpeciesInitialConcentrationByIndex(rr, 0) == 10
-    @test RoadRunner.getFloatingSpeciesInitialConcentrationByIndex(rr, 1) == 2.5
+    @test RoadRunner.getFloatingSpeciesInitialConcentrationByIndex(rr, 0) == 2.5
+    @test RoadRunner.getFloatingSpeciesInitialConcentrationByIndex(rr, 1) == 3.4
 end
