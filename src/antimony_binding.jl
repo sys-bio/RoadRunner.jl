@@ -345,7 +345,7 @@ end
 Returns the nth module name.
 """
 function getNthModuleName(n::Int64)
-  return unsafe_string(ccall(dlsym(antlib, :getNthModuleName), cdecl, Ptr{UInt8}, (UInt64,), n))
+  return unsafe_string(ccall(dlsym(antlib, :getNthModuleName), cdecl, Ptr{UInt8}, (Int64,), n))
 end
 
 """
