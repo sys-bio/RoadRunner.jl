@@ -1405,7 +1405,7 @@ Retrieve the compartment volume for a particular compartment.
 """
 function getCompartmentByIndex(rr::Ptr{Nothing}, index::Int64)
   value = Array{Float64}(undef,1)
-  status = ccall(dlsym(rrlib :getCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
+  status = ccall(dlsym(rrlib, :getCompartmentByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Ptr{Float64}), rr, index, value)
   if status == false
     error(getLastError())
   end
