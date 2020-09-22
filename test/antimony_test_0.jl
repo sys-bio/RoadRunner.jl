@@ -19,16 +19,16 @@ rr = RoadRunner.loada(ant_str)
 
 @testset "parameters" begin
     @test RoadRunner.getNumberOfGlobalParameters(rr) == 4
-    #@test RoadRunner.getGlobalParameterIds(rr) == ["k1", "k2", "k3", "k4"]
+    @test RoadRunner.getGlobalParameterIds(rr) == ["k1", "k2", "k3", "k4"]
 end
 
-#@testset "species" begin
-#    @test RoadRunner.getNumberOfFloatingSpecies(rr) == 2
-#    @test RoadRunner.getFloatingSpeciesIds(rr) == ["S1", "S2"]
-#    @test RoadRunner.getNumberOfBoundarySpecies(rr) == 2
-#    @test RoadRunner.getBoundarySpeciesIds(rr) == ["X0", "X1"]
-#end
+@testset "species" begin
+    @test RoadRunner.getNumberOfFloatingSpecies(rr) == 2
+    @test RoadRunner.getFloatingSpeciesIds(rr) == ["S1", "S2"]
+    @test RoadRunner.getNumberOfBoundarySpecies(rr) == 2
+    @test RoadRunner.getBoundarySpeciesIds(rr) == ["Xo", "X1"]
+end
 
-#@testset "steadystates" begin
-#    @test RoadRunner.steadyState(rr) < 1e-6
-#end
+@testset "steadystates" begin
+    @test RoadRunner.steadyState(rr) < 1e-6
+end
