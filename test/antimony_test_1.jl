@@ -26,7 +26,7 @@ end
 end
 
 @testset "species" begin
-    @test RoadRunner.getNumberOfFloatingSpecies(rr) == 1
+    @test RoadRunner.getNumberOfFloatingSpecies(rr) == 2
     @test RoadRunner.getFloatingSpeciesIds(rr) == ["S1", "S2"]
     @test RoadRunner.getNumberOfBoundarySpecies(rr) == 0
     @test RoadRunner.getBoundarySpeciesIds(rr) == []
