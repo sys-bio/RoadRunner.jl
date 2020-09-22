@@ -1,4 +1,3 @@
-
 include("rrc_types.jl")
 
 @enum ListItemType litString litInteger litDouble litList
