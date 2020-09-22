@@ -17,5 +17,5 @@ rr = RoadRunner.loada(ant_str)
 end
 
 @testset "reaction" begin
-    @test RoadRunner.getNumberOfReactions(rr) == 2
+    @test RoadRunner.getNumberOfReactions(rr) == 1
 end
