@@ -1,6 +1,6 @@
 name = "RoadRunner"
-uuid = "2e139b0f-e59d-4fae-b5dc-733d9b7ae015"
-authors = ["Luke Zhu"]
+uuid = "e916ade1-3a88-4cc2-a33a-2915d20637d9"
+authors = ["Jin Xu"]
 version = "0.1.0"
 
 [deps]
@@ -13,6 +13,7 @@ julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 
 [targets]
-test = ["Test"]
+test = ["Test", "SafeTestsets"]

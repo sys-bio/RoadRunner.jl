@@ -13,8 +13,8 @@ function loadFile(filename::String)
 end
 
 """
-  loadFile(filename::String)
-Load a file of any format libAntimony knows about (potentially Antimony, SBML, or CellML).
+  loadString(model::String)
+Load a string of any format libAntimony knows about (potentially Antimony, SBML, or CellML).
 """
 function loadString(model::String)
   status = ccall(dlsym(antlib, :loadString), cdecl, Int64, (Ptr{UInt8},), model)
@@ -80,25 +80,24 @@ function loadSBMLStringWithLocation(model::String, location::String)
   end
 end
 
-#self added localCellMLFile
+
 """
   loadCellMLFile(filename::String)
 Load a file known to be CellML.
 """
 function loadCellMLFile(filename::String)
-  status = ccall(dlsym(antlib, :loadCellMLFile), cdecl, Int64, (Ptr{UInt8}), filename)
+  status = ccall(dlsym(antlib, :loadCellMLFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
     error(getLastError())
   end
 end
 
-#self added localCellString
 """
   loadCellMLString(model::String)
 Load a string known to be CellML.
 """
 function loadCellMLString(model::String)
-  status = ccall(dlsym(antlib, :loadCellMLString), cdecl, Int64, (Ptr{UInt8}), model)
+  status = ccall(dlsym(antlib, :loadCellMLString), cdecl, Int64, (Ptr{UInt8},), model)
   if status == -1
     error(getLastError())
   end
@@ -109,10 +108,9 @@ end
 Returns the number of files loaded into memory so far.
 """
 function getNumFiles()
-  return ccall(dlsym(antlib, :getNumFiles), cdecl, Int64, ())
+  return ccall(dlsym(antlib, :getNumFiles), cdecl, UInt64, ())
 end
 
-#self added revertTo
 """
   revertTo(Index)
 Change the 'active' set of modules to the ones from the given index (as received from 'load<file/string>').
@@ -143,7 +141,6 @@ function clearPreviousLoads()
   ccall(dlsym(antlib, :clearPreviousLoads), cdecl, Cvoid, ())
 end
 
-#self added addDirectory
 """
   addDirectory(directory::String)
 Add a directory in which imported files may be found,
@@ -151,13 +148,12 @@ and in which to look for a '.antimony' file
 (which contains rules about where to look locally for imported antimony and sbml files).
 """
 function addDirectory(directory::String)
-  status = ccall(dlsym(antlib, :addDirectory), cdecl, Int64, (Ptr{UInt8}), directory)
+  status = ccall(dlsym(antlib, :addDirectory), cdecl, Int64, (Ptr{UInt8},), directory)
   if status == -1
     error(getLastError())
   end
 end
 
-##self added clearDirectories
 """
   clearDirectories()
 Clears the list of directories added with the 'addDirectory' function.
@@ -212,7 +208,6 @@ function getSBMLString(moduleName::String)
   return unsafe_string(ccall(dlsym(antlib, :getSBMLString), cdecl, Ptr{UInt8}, (Ptr{UInt8},), moduleName))
 end
 
-#self added writeCompSBMLFile
 """
   writeCompSBMLFile(filename::String, moduleName::String)
 Writes out a SBML-formatted XML file to the file indicated,
@@ -226,7 +221,6 @@ function writeCompSBMLFile(filename::String, moduleName::String)
   return status
 end
 
-#self added getCompSBMLString
 """
   getCompSBMLString(moduleName::String)
 Returns the same output as writeSBMLFile, but to a char* array instead of to a file,
@@ -236,7 +230,6 @@ function getCompSBMLString(moduleName::String)
   return unsafe_string(ccall(dlsym(antlib, :getCompSBMLString), cdecl, Ptr{UInt8}, (Ptr{UInt8},), moduleName))
 end
 
-#self added writeCellMLFile
 """
   writeCellMLFile(filename::String, moduleName::String)
 Writes out a CellML-formatted XML file to the file indicated,
@@ -250,7 +243,6 @@ function writeCellMLFile(filename::String, moduleName::String)
   return status
 end
 
-#self added getCellMLFile
 """
   getCellMLString(moduleName::String)
 Writes out a CellML-formatted XML file to the file indicated,
@@ -260,19 +252,17 @@ function getCellMLString(moduleName::String)
   return unsafe_string(ccall(dlsym(antlib, :getCellMLString), cdecl, Ptr{UInt8}, (Ptr{UInt8},), moduleName))
 end
 
-#self added printAllDataFor
 """
   printAllDataFor(moduleName::String)
 An example function that will print to stdout all the information in the given module.
 """
 function printAllDataFor(moduleName::String)
-  status = ccall(dlsym(antlib, :printAllDataFor), cdecl, Int64, (Ptr{UInt8}), moduleName)
+  status = ccall(dlsym(antlib, :printAllDataFor), cdecl, Cvoid, (Ptr{UInt8},), moduleName)
   if status == 0
     error(getLastError())
   end
   return status
 end
-
 
 ###################################################################################################
 ##### Errors and Warnings #####
@@ -342,9 +332,8 @@ Returns an array of all the current module names.
 function getModuleNames()
   numModules = getNumModules()
   moduleNames = Array{String}(undef, numModules)
-
   for i = 1:numModules
-    moduleNames[i] = unsafe_string(unsafe_load(ccall(dlsym(antlib, :getModuleNames), cdecl, Ptr{Ptr{UInt8}}, ()), i))
+    moduleNames[i] = unsafe_string(unsafe_load(ccall(dlsym(antlib, :getModuleNames), cdecl, Ptr{Ptr{UInt8}}, (UInt64,), i)))
   end
   return moduleNames
 end
