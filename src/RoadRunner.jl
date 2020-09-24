@@ -3,7 +3,7 @@ __precompile__(false)
 #export my_f(x,y), another function to export
 
 using Libdl
-using Plots
+
 current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
 antimony_api = joinpath(current_dir, "libantimony.dll")
