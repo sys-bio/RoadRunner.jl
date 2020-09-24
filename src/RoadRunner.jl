@@ -40,16 +40,6 @@ function loada(antString::String)
   return rr
 end
 
-#this function is not availabl in C API
-"""
-    plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
-"""
-function plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
-  speciesName = getFloatingSpeciesIds(rr)
-  time = simData[:, 1]
-  plot(time, simData[:, 2:end], label = speciesName)
-end
-
 ###############################################################################
 #            Library Initialization and Termination Methods                   #
 ###############################################################################
