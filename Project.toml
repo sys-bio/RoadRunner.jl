@@ -6,12 +6,10 @@ version = "0.1.0"
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
-Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
 julia = "1"
 Documenter = "0.25"
-Plots = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -3,7 +3,7 @@ __precompile__(false)
 #export my_f(x,y), another function to export
 
 using Libdl
-using Plots
+
 current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
 antimony_api = joinpath(current_dir, "libantimony.dll")
@@ -38,16 +38,6 @@ function loada(antString::String)
     clearPreviousLoads()
   end
   return rr
-end
-
-#this function is not availabl in C API
-"""
-    plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
-"""
-function plotSimulation(simData::Array{Float64, 2}, rr::Ptr{Nothing})
-  speciesName = getFloatingSpeciesIds(rr)
-  time = simData[:, 1]
-  plot(time, simData[:, 2:end], label = speciesName)
 end
 
 ###############################################################################
