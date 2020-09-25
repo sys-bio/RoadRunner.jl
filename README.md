@@ -12,4 +12,4 @@ src/rrc_utilities_binding.jl refers to the documentation of libRoadRunner C API-
 
 src/antimony_binding.jl refers to the documentation of libAntimony C API-antimony_api.h (http://antimony.sourceforge.net/antimony__api_8h.html)
 
-We acknowledge Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) who has initiated this package. 
+We acknowledge Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) who has initiated this Julia package. 
