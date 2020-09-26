@@ -2,7 +2,7 @@
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
-Julia binding for libRoadRunner is a package written in the language of Julia (https://julialang.org/) to make use of libRoadRunner (http://libroadrunner.org/). This package is connecting libRoadRunner by dynamic link library (dll) on the platform of Windows.
+Julia binding for libRoadRunner is a package written in the language of Julia (https://julialang.org/) to make use of libRoadRunner (http://libroadrunner.org/). This package is connecting libRoadRunner by dynamic link library (dll) on the platform of Windows for the language of Julia.
 
 The main code of this package is based on the existed software of libRoadRunner and libAntimony (http://antimony.sourceforge.net/).
 
@@ -12,4 +12,4 @@ src/rrc_utilities_binding.jl refers to the documentation of libRoadRunner C API-
 
 src/antimony_binding.jl refers to the documentation of libAntimony C API-antimony_api.h (http://antimony.sourceforge.net/antimony__api_8h.html)
 
-We acknowledge Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) who has initiated this Julia package. 
+We acknowledge Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) who has initiated this Julia package! 
