@@ -4,6 +4,7 @@ __precompile__(false)
 
 using Libdl
 
+
 current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
 antimony_api = joinpath(current_dir, "libantimony.dll")
@@ -17,9 +18,14 @@ include("rrc_types.jl")
 @enum CLogLevel CL_PRIO_FATAL CL_PRIO_CRITICAL CL_PRIO_ERROR CL_PRIO_WARNING CL_PRIO_NOTICE CL_PRIO_INFORMATION CL_PRIO_DEBUG CL_PRIO_TRACE
 
 function __init__()
-  global rrlib = Libdl.dlopen(rr_api)
-  global antlib = Libdl.dlopen(antimony_api)
+    @static if Sys.iswindows()
+        global rrlib = Libdl.dlopen(rr_api)
+        global antlib = Libdl.dlopen(antimony_api)
+    else
+        @warn "The current version of RoadRunner.jl only supports the platform of Windows x64."
+    end
 end
+
 
 """
     loada(antString::String)
