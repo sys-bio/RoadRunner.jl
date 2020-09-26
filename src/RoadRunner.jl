@@ -22,7 +22,7 @@ function __init__()
         global rrlib = Libdl.dlopen(rr_api)
         global antlib = Libdl.dlopen(antimony_api)
     else
-        @warn "This platform isn't supported by RoadRunner.jl"
+        @warn "The current version of RoadRunner.jl only supports the platform of Windows x64."
     end
 end
 
