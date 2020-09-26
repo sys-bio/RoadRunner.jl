@@ -26,10 +26,6 @@ function __init__()
     end
 end
 
-#function __init__()
-#  global rrlib = Libdl.dlopen(rr_api)
-#  global antlib = Libdl.dlopen(antimony_api)
-#end
 
 """
     loada(antString::String)
