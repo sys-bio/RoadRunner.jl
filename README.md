@@ -2,7 +2,7 @@
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
-Julia binding for libRoadRunner is a package written in the language of Julia (https://julialang.org/) to make use of libRoadRunner (http://libroadrunner.org/). This package is connecting libRoadRunner by dynamic link library (dll) on the platform of Windows 64 for the language of Julia. If you use any of the codes, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
+This project represents a set of Julia bindings (https://julialang.org/) to libRoadRunner (http://libroadrunner.org/). If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
 
 ===
 
