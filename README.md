@@ -1,28 +1,18 @@
 # Julia Bindings for libRoadRunner
-
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
-This project represents a set of Julia bindings (https://julialang.org/) to libRoadRunner (http://libroadrunner.org/). If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
+## Introduction
+This project represents a set of Julia (https://julialang.org/) bindings to libRoadRunner (http://libroadrunner.org/). libRoadrunner is a SBML compliant high performance and simulation engine for systems and synthetic biology. This RoadRunner.jl package supports SBML and Antimony (http://antimony.sourceforge.net/) files as input. If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
 
-===
+## Quick Start
 
-Quickstart:
+    julia> import Pkg
+    julia> Pkg.add("RoadRunner")
+    julia> using RoadRunner
 
-import Pkg
+## Documentation
 
-Pkg.add("RoadRunner")
-
-using RoadRunner
-
-rr = RoadRunner.createRRInstance()
-
-(Roadrunner.FUNCTION_NAME)
-
-You can refer to the test cases under /test for more examples.
-
-===
-
-The main code of this package is based on the existed software of libRoadRunner and libAntimony (http://antimony.sourceforge.net/).
+The main code of this package is based on the existed software of libRoadRunner and libAntimony.
 
 src/RoadRunner.jl refers to the documentation of libRoadRunner C API-rrc_api.h (http://sys-bio.github.io/roadrunner/c_api_docs/html/rrc__api_8h.html).
 
@@ -30,6 +20,35 @@ src/rrc_utilities_binding.jl refers to the documentation of libRoadRunner C API-
 
 src/antimony_binding.jl refers to the documentation of libAntimony C API-antimony_api.h (http://antimony.sourceforge.net/antimony__api_8h.html)
 
+## Requirements
 
-We acknowledge Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) who has assisted and initiated this Julia package!
+This current version of Julia package is suitable for Window 64, and it is compliant for Julia version 1.1-1.5. 
+
+### An example illustrating how to load an SBML file.
+
+    using RoadRunner
+    sbmlFile = "\\path\\to\\file.xml"
+    f = open(sbmlFile)
+    sbmlStr = read(f,String)
+    close(f)
+    rr = RoadRunner.createRRInstance()
+    RoadRunner.loadSBML(rr, sbmlStr)
+
+### An example showing how to load a model in Antimony format. 
+
+    using RoadRunner
+    ant_str = """    
+        const Xo, X1
+        Xo -> S1; k1*Xo - k2*S1
+        S1 -> S2; k3*S2
+        S2 -> X1; k4*S2
+
+        Xo = 1;   X1 = 0
+        S1 = 0;   S2 = 0
+        k1 = 0.1; k2 = 0.56
+        k3 = 1.2; k4 = 0.9
+    """ 
+    rr = RoadRunner.loada(ant_str)
+
+We thank Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) for his assisting and initiating this Julia package!
 
