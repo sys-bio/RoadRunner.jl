@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.com/SunnyXu/RoadRunner.jl.svg?branch=master)](https://travis-ci.com/SunnyXu/RoadRunner.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
-[![Codecov](https://codecov.io/gh/SunnyXu/RoadRunner.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/SunnyXu/RoadRunner.jl)
-[![Coveralls](https://coveralls.io/repos/github/SunnyXu/RoadRunner.jl/badge.svg?branch=master)](https://coveralls.io/github/SunnyXu/RoadRunner.jl?branch=master)
 
 ## Introduction
 This project represents a set of Julia (https://julialang.org/) bindings to libRoadRunner (http://libroadrunner.org/). libRoadrunner is a SBML compliant high performance and simulation engine for systems and synthetic biology. This RoadRunner.jl package supports SBML and Antimony (http://antimony.sourceforge.net/) files as input. If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
