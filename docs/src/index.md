@@ -1,7 +1,12 @@
+# RoadRunner
+
 ```@meta
 CurrentModule = RoadRunner
+DocTestSetup = quote
+    using RoadRunner
+end
 ```
 
-```@docs
-loada
+```@autodocs
+Modules = [RoadRunner]
 ```
