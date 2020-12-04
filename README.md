@@ -15,6 +15,8 @@ This project represents a set of Julia (https://julialang.org/) bindings to libR
 
 ## Documentation
 
+The documentation can be found at: https://SunnyXu.github.io/RoadRunner.jl/
+
 The main code of this package is based on the existed software of libRoadRunner and libAntimony.
 
 src/RoadRunner.jl refers to the documentation of libRoadRunner C API-rrc_api.h (http://sys-bio.github.io/roadrunner/c_api_docs/html/rrc__api_8h.html).
