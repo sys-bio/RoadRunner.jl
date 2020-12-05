@@ -1,17 +1,23 @@
 using Documenter, RoadRunner
 
-isCI = get(ENV, "CI", nothing) == "true"
-
 makedocs(
     modules = [RoadRunner],
-    pages = [
-        "Home" => "index.md"
-    ],
+    authors = "Jin Xu",
+    repo="https://github.com/sunnyXu/RoadRunner.jl/blob/{commit}{path}#L{line}",
     sitename = "RoadRunner.jl",
+    format=Documenter.HTML(;
+    prettyurls=get(ENV, "CI", "false") == "true",
+    canonical="https://sunnyXu.github.io/RoadRunner.jl",
+    assets=String[],
+    ),
+    pages = [
+        "Home" => "index.md",
+    ],
     doctest = true
 )
 
 
-deploydocs(
-    repo = "github.com/Lukez-pi/RoadRunner.jl.git",
+deploydocs(;
+    deps = Deps.pip("mkdocs","python-markdown-math"),
+    repo = "github.com/SunnyXu/RoadRunner.jl",
 )

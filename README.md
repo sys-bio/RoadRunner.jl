@@ -1,4 +1,7 @@
 # Julia Bindings for libRoadRunner
+
+[![Build Status](https://travis-ci.com/SunnyXu/RoadRunner.jl.svg?branch=master)](https://travis-ci.com/SunnyXu/RoadRunner.jl)
+
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
 ## Introduction
@@ -12,6 +15,8 @@ This project represents a set of Julia (https://julialang.org/) bindings to libR
 
 ## Documentation
 
+The documentation can be found at: https://SunnyXu.github.io/RoadRunner.jl/
+
 The main code of this package is based on the existed software of libRoadRunner and libAntimony.
 
 src/RoadRunner.jl refers to the documentation of libRoadRunner C API-rrc_api.h (http://sys-bio.github.io/roadrunner/c_api_docs/html/rrc__api_8h.html).
@@ -22,7 +27,7 @@ src/antimony_binding.jl refers to the documentation of libAntimony C API-antimon
 
 ## Requirements
 
-This current version of Julia package is suitable for Window 64, and it is compliant for Julia version 1.1-1.5. 
+This current version of Julia package is suitable for Window 64, and it is compliant for Julia version 1.1-1.5.
 
 ## Examples
 
@@ -36,7 +41,7 @@ This current version of Julia package is suitable for Window 64, and it is compl
     rr = RoadRunner.createRRInstance()
     RoadRunner.loadSBML(rr, sbmlStr)
 
-### An example showing how to load a model in Antimony format. 
+### An example showing how to load a model in Antimony format.
 
     using RoadRunner
     ant_str = """    
@@ -49,8 +54,7 @@ This current version of Julia package is suitable for Window 64, and it is compl
         S1 = 0;   S2 = 0
         k1 = 0.1; k2 = 0.56
         k3 = 1.2; k4 = 0.9
-    """ 
+    """
     rr = RoadRunner.loada(ant_str)
 
 We thank Luke Zhu (https://github.com/Lukez-pi/RoadRunner.jl) for his assisting and initiating this Julia package!
-
