@@ -2912,11 +2912,11 @@ end
 #                        Configuration Keys and Values                        #
 ###############################################################################
 """
-    setConfigBool(key::String, value::Bool)
+    setConfigBool(key::String, value::Int64)
     Set a boolean configuration value.
 """
-function setConfigBool(key::String, value::Bool)
-    status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
+function setConfigBool(key::String, value::Int64)
+    status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Int64, (Ptr{UInt8}, Cint), key, value)
     if status == false
       error(getLastError())
     end
