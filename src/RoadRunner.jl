@@ -182,7 +182,7 @@ end
 Load simulation settings from a file.
 """
 function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
-  status = call(dlsym(rrlib, :loadSimulationSettings), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
+  status = ccall(dlsym(rrlib, :loadSimulationSettings), cdecl, Bool, (Ptr{Nothing}, Ptr{UInt8}), rr, fileName)
   if status == false
     error(getLastError())
   end
@@ -1158,10 +1158,11 @@ end
 Set the initial concentration for a particular floating species.
 """
 function setFloatingSpeciesInitialConcentrationByIndex(rr::Ptr{Nothing}, index::Int64, value::Float64)
-  status = call(dlsym(rrlib, :setFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
+  status = ccall(dlsym(rrlib, :setFloatingSpeciesInitialConcentrationByIndex), cdecl, Bool, (Ptr{Nothing}, Int64, Float64), rr, index, value)
   if status == false
     error(getLastError())
   end
+  return status
 end
 
 """
@@ -2912,11 +2913,11 @@ end
 #                        Configuration Keys and Values                        #
 ###############################################################################
 """
-    setConfigBool(key::String, value::Bool)
+    setConfigBool(key::String, value::Int64)
     Set a boolean configuration value.
 """
-function setConfigBool(key::String, value::Bool)
-    status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Bool, (Ptr{UInt8}, Cint), key, value)
+function setConfigBool(key::String, value::Int64)
+    status = ccall(dlsym(rrlib, :setConfigBool), cdecl, Int64, (Ptr{UInt8}, Cint), key, value)
     if status == false
       error(getLastError())
     end
