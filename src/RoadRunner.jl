@@ -195,6 +195,7 @@ Retrieve the current state of the model in the form of an SBML string.
 function getCurrentSBML(rr)
   char_pointer=ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr)
   julia_str=unsafe_string(char_pointer)
+  freeText(char_pointer)
   return julia_str
 end
 
