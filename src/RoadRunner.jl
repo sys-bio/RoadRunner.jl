@@ -195,6 +195,7 @@ Retrieve the current state of the model in the form of an SBML string.
 function getCurrentSBML(rr)
   char_pointer=ccall(dlsym(rrlib, :getCurrentSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr)
   julia_str=unsafe_string(char_pointer)
+  freeText(char_pointer)
   return julia_str
 end
 
@@ -205,6 +206,7 @@ Retrieve the SBML model that was last loaded into roadRunner.
 function getSBML(rr)
   char_pointer=ccall(dlsym(rrlib, :getSBML), cdecl, Ptr{UInt8}, (Ptr{Nothing},), rr)
   julia_str=unsafe_string(char_pointer)
+  freeText(char_pointer)
   return julia_str
 end
 
@@ -465,6 +467,7 @@ Retrieve the current error string. Example, str = getLastError (void);
 function getLastError()
   char_pointer = ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ())
   julia_str = unsafe_string(char_pointer)
+  freeText(char_pointer)
   return julia_str
 end
 ###############################################################################
@@ -2271,7 +2274,7 @@ end
     resetRR(rr::Ptr{Nothing})
 Reset all variables of the model to their current initial values. Does not change the parameters.
 """
-function reset(rr::Ptr{Nothing})
+function resetRR(rr::Ptr{Nothing})
   status = ccall(dlsym(rrlib, :reset), cdecl, Bool, (Ptr{Nothing},), rr)
   if status == false
     error(getLastError())
