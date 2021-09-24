@@ -478,7 +478,7 @@ Retrieve the current error string. Example, str = getLastError (void)
 function getLastError()
   char_pointer = ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ())
   julia_str = unsafe_string(char_pointer)
-  #freeText(char_pointer)
+  #freeText(char_pointer) #Why does not work? break?
   return julia_str
 end
 ###############################################################################
