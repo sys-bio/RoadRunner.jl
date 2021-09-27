@@ -25,7 +25,7 @@ src/antimony_binding.jl refers to the documentation of libAntimony C API-antimon
 
 ## Requirements
 
-This current version of Julia package is suitable for Window 64, and it is compliant for Julia version 1.1-1.5.
+This current version of Julia package is suitable for Window 64 and Linux, and it is compliant for Julia version 1.1-1.5.
 
 ## Examples
 
