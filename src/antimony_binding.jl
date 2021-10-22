@@ -267,19 +267,10 @@ end
 ###################################################################################################
 ##### Errors and Warnings #####
 ###################################################################################################
-"""
-  checkModule(moduleName::String)
-Returns 'true' if the submitted module name exists in the current active set, 'false' if not.
-"""
-function checkModule(moduleName::String)
-  status = ccall(dlsym(antlib, :checkModule), cdecl, Bool, (Ptr{UInt8},), moduleName)
-  if status == false
-    error(getLastError())
-  end
-end
+
 
 """
-  getLastError()
+  antimony_getLastError()
 When any function returns an error condition, a longer description of the problem is
 stored in memory, and is obtainable with this function.
 """

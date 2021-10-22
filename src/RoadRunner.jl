@@ -187,6 +187,7 @@ function isModelLoaded(rr::Ptr{Nothing})
   return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing},), rr)
 end
 
+
 """
     loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
 Load simulation settings from a file.
@@ -471,13 +472,13 @@ function hasError()
 end
 
 """
-    getLastError()
-Retrieve the current error string. Example, str = getLastError (void);
+    RoadRunner_getLastError()
+Retrieve the current error string. Example, str = getLastError (void)
 """
 function getLastError()
   char_pointer = ccall(dlsym(rrlib, :getLastError), cdecl, Ptr{UInt8}, ())
   julia_str = unsafe_string(char_pointer)
-  #freeText(char_pointer)
+  #freeText(char_pointer) #Why does not work? break?
   return julia_str
 end
 ###############################################################################
@@ -2772,14 +2773,6 @@ function solverTypeToString(code::Int64)
 end
 
 """
-    getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
-Get the type of a parameter of the current steady state solver.
-"""
-function getCurrentSteadyStateSolverNthParameterType(rr::Ptr{Nothing}, n::Int64)
-  return ccall(dlsym(rrlib, :getCurrentSteadyStateSolverNthParameterType), cdecl, Cint, (Ptr{Nothing}, Cint), rr, n)
-end
-
-"""
     getListOfCurrentSteadyStateSolverParameterNames(rr::Ptr{Nothing})
 Get the names of adjustable settings for the current steady state solver.
 """
@@ -3342,14 +3335,6 @@ function setBoundary(rr::Ptr{Nothing}, sid::String, boundaryCondition::Bool, for
   if status == false
     error(getLastError())
   end
-end
-
-"""
-    isModelLoaded(rr::Ptr{Nothing})
-check if a model is loaded
-"""
-function isModelLoaded(rr::Ptr{Nothing})
-  return ccall(dlsym(rrlib, :isModelLoaded), cdecl, Bool, (Ptr{Nothing}, ), rr)
 end
 
 """
