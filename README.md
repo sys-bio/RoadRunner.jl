@@ -4,6 +4,9 @@
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
+[![Github All Releases](https://img.shields.io/github/downloads/SunnyXu/RoadRunner.jl/total.svg)]()
+
+
 ## Introduction
 This project represents a set of Julia (https://julialang.org/) bindings to libRoadRunner (http://libroadrunner.org/). libRoadrunner is a SBML compliant high performance and simulation engine for systems and synthetic biology. This RoadRunner.jl package supports SBML and Antimony (http://antimony.sourceforge.net/) files as input. If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
 
@@ -25,7 +28,7 @@ src/antimony_binding.jl refers to the documentation of libAntimony C API-antimon
 
 ## Requirements
 
-This current version of Julia package is suitable for Window 64 and Linux, and it is compliant for Julia version 1.1-1.5.
+This current version of Julia package is suitable for Window 64 and Linux, and it is compliant for Julia version 1.1-1.6.
 
 ## Examples
 
