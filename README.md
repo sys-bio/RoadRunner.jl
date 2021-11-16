@@ -4,7 +4,6 @@
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/SunnyXu/RoadRunner.jl?svg=true)](https://ci.appveyor.com/project/SunnyXu/RoadRunner-jl)
 
-[![Github All Releases](https://img.shields.io/github/downloads/SunnyXu/RoadRunner.jl/total.svg)]()
 
 
 ## Introduction
