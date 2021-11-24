@@ -6,7 +6,7 @@
 Load a file of any format libAntimony knows about (potentially Antimony, SBML, or CellML).
 """
 function loadFile(filename::String)
-  status = ccall(dlsym(antlib, :loadFile), cdecl, Int64, (Ptr{UInt8},), fileName)
+  status = ccall(dlsym(antlib, :loadFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
     error(getLastError())
   end
@@ -28,7 +28,7 @@ end
 Loads a file and parses it as an Antimony file.
 """
 function loadAntimonyFile(filename::String)
-  status = ccall(dlsym(antlib, :loadAntimonyFile), cdecl, Int64, (Ptr{UInt8},), fileName)
+  status = ccall(dlsym(antlib, :loadAntimonyFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
     error(getLastError())
   end
