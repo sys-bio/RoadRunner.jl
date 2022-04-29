@@ -7,7 +7,7 @@
 
 
 ## Introduction
-This project represents a set of Julia (https://julialang.org/) bindings to libRoadRunner (http://libroadrunner.org/). libRoadrunner is a SBML compliant high performance and simulation engine for systems and synthetic biology. This RoadRunner.jl package supports SBML and Antimony (http://antimony.sourceforge.net/) files as input. If you use any of the software, please cite the GitHub website (https://github.com/SunnyXu/RoadRunner.jl).
+This project represents a set of Julia (https://julialang.org/) bindings to libRoadRunner (http://libroadrunner.org/). libRoadrunner is a SBML compliant high performance and simulation engine for systems and synthetic biology. This RoadRunner.jl package supports SBML and Antimony (http://antimony.sourceforge.net/) files as input. If you use any of the software, please please cite the arXiv (https://arxiv.org/abs/2203.01175) and GitHub website (https://github.com/SunnyXu/RoadRunner.jl). Thanks.
 
 ## Quick Start
 
