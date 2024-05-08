@@ -1,7 +1,7 @@
 name = "RoadRunner"
 uuid = "e916ade1-3a88-4cc2-a33a-2915d20637d9"
-authors = ["Jin Xu"]
-version = "2.6.0"
+authors = ["Jin Xu", "Adel Heydarabadipour"]
+version = "2.7.0"
 
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
