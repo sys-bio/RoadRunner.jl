@@ -200,7 +200,7 @@ function loadSimulationSettings(rr::Ptr{Nothing}, fileName::String)
 end
 
 """
-    getCurrentSBM(handle::Ptr{Nothing})
+    getCurrentSBML(handle::Ptr{Nothing})
 Retrieve the current state of the model in the form of an SBML string.
 """
 function getCurrentSBML(rr)
@@ -219,6 +219,24 @@ function getSBML(rr)
   julia_str=unsafe_string(char_pointer)
   freeText(char_pointer)
   return julia_str
+end
+
+"""
+    getCurrentAntimony(handle::Ptr{Nothing})
+Retrieve the current state of the model in the form of an antimony string
+"""
+function getCurrentAntimony(rr)
+  loadSBMLString(getCurrentSBML(rr))
+  return getAntimonyString(getMainModuleName())
+end
+
+"""
+  getAntimony
+Retrieve an antimony-formatted string associated with the last SBML model loaded into RoadRunner.
+"""
+function getAntimony(rr)
+  loadSBMLString(getSBML(rr))
+  return getAntimonyString(getMainModuleName())
 end
 
 ###############################################################################
