@@ -269,14 +269,6 @@ end
 ###################################################################################################
 
 
-"""
-  antimony_getLastError()
-When any function returns an error condition, a longer description of the problem is
-stored in memory, and is obtainable with this function.
-"""
-function getLastError()
-  return unsafe_string(ccall(dlsym(antlib, :getLastError), cdecl, Ptr{UInt8}, ()))
-end
 
 """
   getWarnings()
