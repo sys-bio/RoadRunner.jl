@@ -185,9 +185,7 @@ end
 Returns the same output as writeAntimonyFile, but to a char* array instead of to a file.
 """
 function getAntimonyString(moduleName::String)
-  char_pointer=ccall(dlsym(antlib, :getAntimonyString), cdecl, Ptr{UInt8}, (Ptr{UInt8},), moduleName)
-  julia_str=unsafe_string(char_pointer)
-  return julia_str
+  return unsafe_string(ccall(dlsym(antlib, :getAntimonyString), cdecl, Ptr{UInt8}, (Ptr{UInt8},), moduleName))
 end
 
 """
