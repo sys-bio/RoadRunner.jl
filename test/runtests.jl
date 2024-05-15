@@ -1,5 +1,7 @@
 using SafeTestsets
 
+
+println(pwd())
 @safetestset "antimony test 0" begin include("antimony_test_0.jl") end
 
 @safetestset "antimony test 1" begin include("antimony_test_1.jl") end
@@ -19,3 +21,5 @@ using SafeTestsets
 @safetestset "antimony test 8" begin include("antimony_test_8.jl") end
 
 @safetestset "sbml test" begin include("sbml_test.jl") end
+
+@safetestset "error test" begin include("error_test.jl") end
