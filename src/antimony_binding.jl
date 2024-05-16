@@ -8,7 +8,7 @@ Load a file of any format libAntimony knows about (potentially Antimony, SBML, o
 function loadFile(filename::String)
   status = ccall(dlsym(antlib, :loadFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -19,7 +19,7 @@ Load a string of any format libAntimony knows about (potentially Antimony, SBML,
 function loadString(model::String)
   status = ccall(dlsym(antlib, :loadString), cdecl, Int64, (Ptr{UInt8},), model)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -30,7 +30,7 @@ Loads a file and parses it as an Antimony file.
 function loadAntimonyFile(filename::String)
   status = ccall(dlsym(antlib, :loadAntimonyFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -41,7 +41,7 @@ Loads a string and parses it as an Antimony set of modules.
 function loadAntimonyString(antModel::String)
   status = ccall(dlsym(antlib, :loadAntimonyString), cdecl, Int64, (Ptr{UInt8},), antModel)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -53,7 +53,7 @@ Load a file known to be SBML.
 function loadSBMLFile(filename::String)
   status = ccall(dlsym(antlib, :loadSBMLFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -65,7 +65,7 @@ Load a string known to be SBML.
 function loadSBMLString(model::String)
   status = ccall(dlsym(antlib, :loadSBMLString), cdecl, Int64, (Ptr{UInt8},), model)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -76,7 +76,7 @@ Load a string known to be SBML with its file location.
 function loadSBMLStringWithLocation(model::String, location::String)
   status = ccall(dlsym(antlib, :loadSBMLStringWithLocation), cdecl, Int64, (Ptr{UInt8}, Ptr{UInt8}), model, location)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -88,7 +88,7 @@ Load a file known to be CellML.
 function loadCellMLFile(filename::String)
   status = ccall(dlsym(antlib, :loadCellMLFile), cdecl, Int64, (Ptr{UInt8},), filename)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -99,7 +99,7 @@ Load a string known to be CellML.
 function loadCellMLString(model::String)
   status = ccall(dlsym(antlib, :loadCellMLString), cdecl, Int64, (Ptr{UInt8},), model)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -118,7 +118,7 @@ Change the 'active' set of modules to the ones from the given index (as received
 function revertTo(Index)
   status = ccall(dlsym(antlib, :revertTo), cdecl, Bool, (Int64,), Index)
   if status == false
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -129,7 +129,7 @@ Returns 'true' if the submitted module name exists in the current active set, 'f
 function checkModule(moduleName::String)
   status = ccall(dlsym(antlib, :checkModule), cdecl, Bool, (Ptr{UInt8},), moduleName)
   if status == false
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -150,7 +150,7 @@ and in which to look for a '.antimony' file
 function addDirectory(directory::String)
   status = ccall(dlsym(antlib, :addDirectory), cdecl, Int64, (Ptr{UInt8},), directory)
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -161,7 +161,7 @@ Clears the list of directories added with the 'addDirectory' function.
 function clearDirectories()
   status = ccall(dlsym(antlib, :clearDirectories), cdecl, Int64, ())
   if status == -1
-    error(getLastError())
+    error(getLastAntimonyError())
   end
 end
 
@@ -175,7 +175,7 @@ Writes out an antimony-formatted file containing the given module.
 function writeAntimonyFile(filename::String, moduleName::String)
   status = ccall(dlsym(antlib, :writeAntimonyFile), cdecl, Int64, (Ptr{UInt8}, Ptr{UInt8}), filename, moduleName)
   if status == 0
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -195,7 +195,7 @@ Writes out a SBML-formatted XML file to the file indicated.
 function writeSBMLFile(filename::String, moduleName::String)
   status = ccall(dlsym(antlib, :writeSBMLFile), cdecl, Int64, (Ptr{UInt8}, Ptr{UInt8}), filename, moduleName)
   if status == 0
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -216,7 +216,7 @@ using the 'Hierarchichal Model Composition' package
 function writeCompSBMLFile(filename::String, moduleName::String)
   status = ccall(dlsym(antlib, :writeCompSBMLFile), cdecl, Int64, (Ptr{UInt8}, Ptr{UInt8}), filename, moduleName)
   if status == 0
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -238,7 +238,7 @@ retaining the same Antimony hierarchy using the CellML 'component' hieararchy.
 function writeCellMLFile(filename::String, moduleName::String)
   status = ccall(dlsym(antlib, :writeCellMLFile), cdecl, Int64, (Ptr{UInt8}, Ptr{UInt8}), filename, moduleName)
   if status == 0
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -259,7 +259,7 @@ An example function that will print to stdout all the information in the given m
 function printAllDataFor(moduleName::String)
   status = ccall(dlsym(antlib, :printAllDataFor), cdecl, Cvoid, (Ptr{UInt8},), moduleName)
   if status == 0
-    error(getLastError())
+    error(getLastAntimonyError())
   end
   return status
 end
@@ -274,7 +274,7 @@ end
 When any function returns an error condition, a longer description of the problem is
 stored in memory, and is obtainable with this function.
 """
-function getLastError()
+function getLastAntimonyError()
   return unsafe_string(ccall(dlsym(antlib, :getLastError), cdecl, Ptr{UInt8}, ()))
 end
 

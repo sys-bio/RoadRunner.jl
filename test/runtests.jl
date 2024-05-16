@@ -19,3 +19,5 @@ using SafeTestsets
 @safetestset "antimony test 8" begin include("antimony_test_8.jl") end
 
 @safetestset "sbml test" begin include("sbml_test.jl") end
+
+@safetestset "error test" begin include("error_test.jl") end
