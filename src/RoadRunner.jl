@@ -7,6 +7,7 @@ using Libdl
 
 current_dir = @__DIR__
 rr_api = joinpath(current_dir, "roadrunner_c_api.dll")
+chmod(rr_api, filemode(rr_api) | 0o755)
 antimony_api = joinpath(current_dir, "libantimony.dll")
 rr_api_linux = joinpath(current_dir, "libroadrunner_c_api.so")
 antimony_api_linux = joinpath(current_dir, "libantimony.so")
